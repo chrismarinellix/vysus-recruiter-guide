@@ -629,7 +629,7 @@
             }
         });
 
-        function handleFileSelect(file) {
+        async function handleFileSelect(file) {
             const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
             if (!validTypes.includes(file.type)) {
                 alert('Please upload a PDF, DOC, or DOCX file.');
@@ -640,6 +640,56 @@
             document.getElementById('fileName').textContent = file.name;
             document.getElementById('fileInfo').classList.add('visible');
             document.getElementById('analyzeBtn').disabled = false;
+
+            // Try to extract name and email from resume
+            try {
+                const text = await readFileAsText(file);
+                const extracted = extractCandidateInfo(text);
+
+                if (extracted.name) {
+                    document.getElementById('candidateName').value = extracted.name;
+                }
+                if (extracted.email) {
+                    document.getElementById('candidateEmail').value = extracted.email;
+                }
+            } catch (err) {
+                console.log('Could not extract info from resume:', err);
+            }
+        }
+
+        // Extract candidate name and email from resume text
+        function extractCandidateInfo(text) {
+            const result = { name: '', email: '' };
+
+            // Extract email using regex
+            const emailMatch = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+            if (emailMatch) {
+                result.email = emailMatch[0];
+            }
+
+            // Extract name - usually the first line or first non-empty line
+            const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            if (lines.length > 0) {
+                // First line is often the name
+                let nameLine = lines[0];
+
+                // Skip if it looks like a header/title
+                const skipWords = ['resume', 'cv', 'curriculum', 'vitae', 'profile'];
+                if (skipWords.some(w => nameLine.toLowerCase().includes(w))) {
+                    nameLine = lines[1] || '';
+                }
+
+                // Clean up - remove titles, extra spaces
+                nameLine = nameLine.replace(/^(mr|mrs|ms|dr|prof)\.?\s*/i, '');
+                nameLine = nameLine.replace(/\s+/g, ' ').trim();
+
+                // Only use if it looks like a name (2-4 words, letters only)
+                if (nameLine && nameLine.split(' ').length <= 4 && /^[a-zA-Z\s\-']+$/.test(nameLine)) {
+                    result.name = nameLine;
+                }
+            }
+
+            return result;
         }
 
         // Analyze resume
