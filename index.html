@@ -1,0 +1,1963 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recruiter Pre-Screening Guide | Vysus Group</title>
+    <style>
+        :root {
+            /* Primary */
+            --vysus-stockholm-neon: #00E3A9;
+            --vysus-malmo-green: #005454;
+
+            /* Neutrals */
+            --vysus-white: #FFFFFF;
+            --vysus-oslo-snow: #F8F8F8;
+            --vysus-stavanger-ice: #EDEDED;
+            --vysus-bergen-rain: #DADADA;
+            --vysus-scandinavia-rock: #485559;
+            --vysus-trondheim-night: #1D1D1B;
+
+            /* Typography */
+            --vysus-font-primary: 'Suisse International', Arial, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--vysus-font-primary);
+            font-weight: 300;
+            color: var(--vysus-trondheim-night);
+            line-height: 1.2;
+            background: var(--vysus-white);
+        }
+
+        /* Header with Chevron Background */
+        .header {
+            background: var(--vysus-malmo-green);
+            padding: 60px 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 60%;
+            height: 200%;
+            background: var(--vysus-stockholm-neon);
+            transform: skewX(-15deg);
+            opacity: 0.15;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            top: -30%;
+            right: 5%;
+            width: 40%;
+            height: 160%;
+            background: var(--vysus-stockholm-neon);
+            transform: skewX(-15deg);
+            opacity: 0.1;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 40px;
+        }
+
+        .vysus-marque {
+            width: 50px;
+            height: auto;
+        }
+
+        .logo-text {
+            color: var(--vysus-white);
+            font-size: 24px;
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+
+        .header h1 {
+            color: var(--vysus-white);
+            font-size: 48px;
+            font-weight: 300;
+            margin-bottom: 16px;
+            line-height: 1.1;
+        }
+
+        .header .subtitle {
+            color: var(--vysus-stockholm-neon);
+            font-size: 20px;
+            font-weight: 400;
+        }
+
+        /* Main Content */
+        .main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 40px 120px;
+        }
+
+        /* Introduction */
+        .intro {
+            background: var(--vysus-oslo-snow);
+            padding: 40px;
+            margin-bottom: 60px;
+            border-left: 4px solid var(--vysus-stockholm-neon);
+        }
+
+        .intro h2 {
+            color: var(--vysus-malmo-green);
+            font-size: 24px;
+            font-weight: 400;
+            margin-bottom: 16px;
+        }
+
+        .intro p {
+            color: var(--vysus-scandinavia-rock);
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        /* Role Progression - Clean 3-column design */
+        .role-progression {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-bottom: 60px;
+        }
+
+        .role-card {
+            background: var(--vysus-white);
+            border: 2px solid var(--vysus-bergen-rain);
+            position: relative;
+        }
+
+        .role-card.lead {
+            border-color: rgba(0, 227, 169, 0.4);
+        }
+
+        .role-card.principal {
+            border-color: var(--vysus-stockholm-neon);
+        }
+
+        .role-card-header {
+            padding: 20px 24px;
+            background: var(--vysus-stavanger-ice);
+            border-bottom: 2px solid var(--vysus-bergen-rain);
+        }
+
+        .role-card.lead .role-card-header {
+            background: rgba(0, 227, 169, 0.15);
+            border-bottom-color: rgba(0, 227, 169, 0.4);
+        }
+
+        .role-card.principal .role-card-header {
+            background: var(--vysus-stockholm-neon);
+            border-bottom-color: var(--vysus-stockholm-neon);
+        }
+
+        .role-card-header h3 {
+            font-size: 18px;
+            font-weight: 400;
+            color: var(--vysus-malmo-green);
+            margin: 0;
+        }
+
+        .role-card-header .focus {
+            font-size: 12px;
+            color: var(--vysus-scandinavia-rock);
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .role-card.principal .role-card-header .focus {
+            color: var(--vysus-malmo-green);
+        }
+
+        .role-card-body {
+            padding: 20px 24px;
+        }
+
+        .role-card-body ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .role-card-body li {
+            padding: 8px 0;
+            font-size: 14px;
+            color: var(--vysus-scandinavia-rock);
+            border-bottom: 1px solid var(--vysus-stavanger-ice);
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .role-card-body li:last-child {
+            border-bottom: none;
+        }
+
+        .role-card-body li::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: var(--vysus-bergen-rain);
+            margin-top: 6px;
+            flex-shrink: 0;
+        }
+
+        /* NEW items get emphasis */
+        .role-card-body li.new-skill {
+            color: var(--vysus-malmo-green);
+            font-weight: 400;
+        }
+
+        .role-card-body li.new-skill::before {
+            background: var(--vysus-stockholm-neon);
+            width: 8px;
+            height: 8px;
+            margin-top: 5px;
+        }
+
+        .new-badge {
+            font-size: 10px;
+            padding: 2px 6px;
+            background: var(--vysus-stockholm-neon);
+            color: var(--vysus-malmo-green);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+
+        .role-card.lead .new-badge {
+            background: rgba(0, 227, 169, 0.3);
+        }
+
+        @media (max-width: 900px) {
+            .role-progression {
+                grid-template-columns: 1fr;
+            }
+
+            .leadership-bracket {
+                display: none;
+            }
+        }
+
+        /* Leadership bracket */
+        .leadership-bracket {
+            margin-top: -20px;
+            margin-bottom: 60px;
+            padding-left: calc(33.33% + 12px);
+        }
+
+        .bracket-visual {
+            display: flex;
+            align-items: flex-start;
+            height: 30px;
+            position: relative;
+        }
+
+        .bracket-arm {
+            flex: 1;
+            height: 16px;
+            border-bottom: 3px solid var(--vysus-stockholm-neon);
+        }
+
+        .bracket-arm.left {
+            border-left: 3px solid var(--vysus-stockholm-neon);
+            border-bottom-left-radius: 6px;
+        }
+
+        .bracket-arm.right {
+            border-right: 3px solid var(--vysus-stockholm-neon);
+            border-bottom-right-radius: 6px;
+        }
+
+        .bracket-stem {
+            width: 3px;
+            height: 30px;
+            background: var(--vysus-stockholm-neon);
+            position: absolute;
+            left: 50%;
+            top: 16px;
+        }
+
+        .bracket-message {
+            margin-top: 16px;
+            padding: 24px 30px;
+            background: var(--vysus-oslo-snow);
+            border-left: 4px solid var(--vysus-stockholm-neon);
+            max-width: 100%;
+        }
+
+        .bracket-message p {
+            font-size: 14px;
+            color: var(--vysus-scandinavia-rock);
+            line-height: 1.6;
+            font-style: italic;
+        }
+
+        /* Question Level Tags - vertical right side */
+        .question-levels {
+            display: none;
+        }
+
+        .question-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 90px;
+            align-items: stretch;
+        }
+
+        .level-tag {
+            padding: 6px 12px;
+            font-size: 11px;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-align: center;
+        }
+
+        .level-tag.senior {
+            background: var(--vysus-stavanger-ice);
+            color: var(--vysus-scandinavia-rock);
+        }
+
+        .level-tag.lead {
+            background: rgba(0, 227, 169, 0.3);
+            color: var(--vysus-malmo-green);
+        }
+
+        .level-tag.principal {
+            background: var(--vysus-stockholm-neon);
+            color: var(--vysus-malmo-green);
+            font-weight: 500;
+        }
+
+        /* Section Styling */
+        .section {
+            margin-bottom: 60px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--vysus-stavanger-ice);
+        }
+
+        .section-number {
+            background: var(--vysus-stockholm-neon);
+            color: var(--vysus-malmo-green);
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 400;
+        }
+
+        .section-title {
+            color: var(--vysus-malmo-green);
+            font-size: 28px;
+            font-weight: 400;
+        }
+
+        /* Question Cards */
+        .question-card {
+            background: var(--vysus-white);
+            border: 1px solid var(--vysus-bergen-rain);
+            margin-bottom: 24px;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .question-card:hover {
+            box-shadow: 0 4px 20px rgba(0, 84, 84, 0.1);
+        }
+
+        .question-header {
+            background: var(--vysus-malmo-green);
+            color: var(--vysus-white);
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .question-id {
+            background: var(--vysus-stockholm-neon);
+            color: var(--vysus-malmo-green);
+            padding: 4px 12px;
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        .question-text {
+            font-size: 16px;
+            font-weight: 300;
+            flex: 1;
+        }
+
+        .question-body {
+            padding: 20px 24px;
+            display: flex;
+            gap: 24px;
+        }
+
+        .question-content {
+            flex: 1;
+        }
+
+        .question-right {
+            display: flex;
+            gap: 16px;
+        }
+
+        .listen-for {
+            margin-bottom: 0;
+        }
+
+        .listen-for h4 {
+            color: var(--vysus-malmo-green);
+            font-size: 13px;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .listen-for ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .listen-for li {
+            padding: 5px 0 5px 20px;
+            position: relative;
+            color: var(--vysus-scandinavia-rock);
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .listen-for li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 12px;
+            width: 6px;
+            height: 6px;
+            background: var(--vysus-stockholm-neon);
+        }
+
+        /* Flags - compact right side */
+        .flags {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 180px;
+        }
+
+        .flag-box {
+            padding: 10px 12px;
+        }
+
+        .flag-box.green {
+            background: rgba(0, 227, 169, 0.1);
+            border-left: 3px solid var(--vysus-stockholm-neon);
+        }
+
+        .flag-box.red {
+            background: rgba(249, 45, 99, 0.1);
+            border-left: 3px solid #F92D63;
+        }
+
+        .flag-box h5 {
+            font-size: 10px;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .flag-box.green h5 {
+            color: var(--vysus-malmo-green);
+        }
+
+        .flag-box.red h5 {
+            color: #F92D63;
+        }
+
+        .flag-box p {
+            font-size: 12px;
+            color: var(--vysus-trondheim-night);
+            line-height: 1.3;
+        }
+
+        @media (max-width: 900px) {
+            .question-body {
+                flex-direction: column;
+            }
+
+            .question-right {
+                flex-direction: row;
+            }
+
+            .flags {
+                min-width: auto;
+                flex: 1;
+            }
+
+            .question-sidebar {
+                flex-direction: row;
+                min-width: auto;
+            }
+        }
+
+        /* Reference Table */
+        .reference-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .reference-table th {
+            background: var(--vysus-malmo-green);
+            color: var(--vysus-white);
+            padding: 16px 20px;
+            text-align: left;
+            font-weight: 400;
+            font-size: 14px;
+        }
+
+        .reference-table td {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--vysus-stavanger-ice);
+            font-size: 14px;
+            color: var(--vysus-scandinavia-rock);
+            line-height: 1.4;
+        }
+
+        .reference-table tr:nth-child(even) {
+            background: var(--vysus-oslo-snow);
+        }
+
+        .reference-table .trait {
+            color: var(--vysus-malmo-green);
+            font-weight: 400;
+        }
+
+        /* Scoring Section */
+        .scoring-card {
+            background: var(--vysus-oslo-snow);
+            padding: 40px;
+            margin-top: 40px;
+        }
+
+        .scoring-card h3 {
+            color: var(--vysus-malmo-green);
+            font-size: 24px;
+            font-weight: 400;
+            margin-bottom: 24px;
+        }
+
+        .score-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .score-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: var(--vysus-white);
+            padding: 16px 20px;
+            border: 1px solid var(--vysus-bergen-rain);
+        }
+
+        .score-item label {
+            flex: 1;
+            color: var(--vysus-trondheim-night);
+            font-size: 15px;
+        }
+
+        .score-input {
+            width: 60px;
+            padding: 8px 12px;
+            border: 2px solid var(--vysus-bergen-rain);
+            font-size: 16px;
+            text-align: center;
+            font-family: var(--vysus-font-primary);
+        }
+
+        .score-input:focus {
+            outline: none;
+            border-color: var(--vysus-stockholm-neon);
+        }
+
+        /* Per-question scoring - one-click buttons */
+        .question-score {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 12px 24px;
+            background: var(--vysus-oslo-snow);
+            border-top: 1px solid var(--vysus-bergen-rain);
+        }
+
+        .score-btn {
+            padding: 8px 16px;
+            border: 2px solid var(--vysus-bergen-rain);
+            background: var(--vysus-white);
+            font-size: 12px;
+            font-family: var(--vysus-font-primary);
+            cursor: pointer;
+            transition: all 0.15s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .score-btn:hover {
+            border-color: var(--vysus-scandinavia-rock);
+        }
+
+        .score-btn.concern {
+            color: #F92D63;
+        }
+
+        .score-btn.concern.selected {
+            background: rgba(249, 45, 99, 0.15);
+            border-color: #F92D63;
+            color: #F92D63;
+        }
+
+        .score-btn.ok {
+            color: var(--vysus-scandinavia-rock);
+        }
+
+        .score-btn.ok.selected {
+            background: rgba(0, 84, 84, 0.1);
+            border-color: var(--vysus-malmo-green);
+            color: var(--vysus-malmo-green);
+        }
+
+        .score-btn.strong {
+            color: var(--vysus-malmo-green);
+        }
+
+        .score-btn.strong.selected {
+            background: rgba(0, 227, 169, 0.2);
+            border-color: var(--vysus-stockholm-neon);
+            color: var(--vysus-malmo-green);
+        }
+
+        /* Score dots indicator on question header */
+        .score-dots {
+            display: flex;
+            gap: 4px;
+            margin-left: auto;
+            align-items: center;
+        }
+
+        .score-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.25);
+            transition: all 0.2s;
+        }
+
+        .score-dots[data-score="1"] .score-dot:nth-child(1) {
+            background: #F92D63;
+        }
+
+        .score-dots[data-score="3"] .score-dot:nth-child(1),
+        .score-dots[data-score="3"] .score-dot:nth-child(2),
+        .score-dots[data-score="3"] .score-dot:nth-child(3) {
+            background: rgba(255,255,255,0.8);
+        }
+
+        .score-dots[data-score="5"] .score-dot {
+            background: var(--vysus-stockholm-neon);
+        }
+
+        /* Fixed bottom scoring bar */
+        .scoring-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: var(--vysus-white);
+            z-index: 100;
+            padding: 16px 24px;
+            border-top: 3px solid var(--vysus-stockholm-neon);
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+            display: none;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .scoring-bar.visible {
+            display: block;
+        }
+
+        .scoring-bar-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .candidate-name-input {
+            padding: 10px 16px;
+            border: 2px solid var(--vysus-bergen-rain);
+            font-size: 15px;
+            font-family: var(--vysus-font-primary);
+            width: 200px;
+        }
+
+        .candidate-name-input:focus {
+            outline: none;
+            border-color: var(--vysus-stockholm-neon);
+        }
+
+        .score-chips {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex: 1;
+        }
+
+        .score-chip {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: var(--vysus-oslo-snow);
+            font-size: 13px;
+        }
+
+        .score-chip .chip-label {
+            color: var(--vysus-scandinavia-rock);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 11px;
+        }
+
+        .score-chip .chip-value {
+            font-size: 16px;
+            font-weight: 400;
+            color: var(--vysus-malmo-green);
+        }
+
+        .score-chip.total {
+            background: var(--vysus-stockholm-neon);
+            padding: 8px 16px;
+        }
+
+        .score-chip.total .chip-value {
+            font-size: 20px;
+            font-weight: 500;
+        }
+
+        .pass-fail-indicator {
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .pass-fail-indicator.pass {
+            background: rgba(0, 227, 169, 0.2);
+            color: var(--vysus-malmo-green);
+        }
+
+        .pass-fail-indicator.fail {
+            background: rgba(249, 45, 99, 0.15);
+            color: #F92D63;
+        }
+
+        .pass-fail-indicator.pending {
+            background: var(--vysus-stavanger-ice);
+            color: var(--vysus-scandinavia-rock);
+        }
+
+        .bar-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .bar-btn {
+            padding: 10px 20px;
+            border: none;
+            font-size: 12px;
+            font-family: var(--vysus-font-primary);
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .bar-btn.save {
+            background: var(--vysus-malmo-green);
+            color: var(--vysus-white);
+        }
+
+        .bar-btn.save:hover {
+            background: var(--vysus-trondheim-night);
+        }
+
+        .bar-btn.email {
+            background: var(--vysus-stavanger-ice);
+            color: var(--vysus-malmo-green);
+        }
+
+        .bar-btn.email:hover {
+            background: var(--vysus-bergen-rain);
+        }
+
+        /* Candidate Summary Panel */
+        .summary-panel {
+            display: none;
+            width: 100%;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--vysus-bergen-rain);
+        }
+
+        .summary-panel.visible {
+            display: block;
+        }
+
+        .summary-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+        }
+
+        .summary-block {
+            padding: 16px;
+            background: var(--vysus-oslo-snow);
+        }
+
+        .summary-block h5 {
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            color: var(--vysus-malmo-green);
+        }
+
+        .summary-block.strengths {
+            border-left: 3px solid var(--vysus-stockholm-neon);
+        }
+
+        .summary-block.concerns {
+            border-left: 3px solid #F92D63;
+        }
+
+        .summary-block.recommendation {
+            border-left: 3px solid var(--vysus-malmo-green);
+        }
+
+        .summary-block ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .summary-block li {
+            font-size: 13px;
+            color: var(--vysus-scandinavia-rock);
+            padding: 3px 0;
+        }
+
+        .summary-block .rec-level {
+            font-size: 18px;
+            font-weight: 400;
+            color: var(--vysus-malmo-green);
+            margin-bottom: 8px;
+        }
+
+        .summary-block .rec-reasoning {
+            font-size: 13px;
+            color: var(--vysus-scandinavia-rock);
+            line-height: 1.5;
+        }
+
+        .summary-block .rec-caution {
+            margin-top: 8px;
+            font-size: 12px;
+            color: #F92D63;
+            font-style: italic;
+        }
+
+        @media (max-width: 900px) {
+            .summary-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .scoring-bar-inner {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .score-chips {
+                flex-wrap: wrap;
+            }
+
+            .candidate-name-input {
+                width: 100%;
+            }
+        }
+
+        .pass-criteria {
+            background: var(--vysus-stockholm-neon);
+            color: var(--vysus-malmo-green);
+            padding: 16px 24px;
+            font-size: 15px;
+            font-weight: 400;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--vysus-trondheim-night);
+            color: var(--vysus-white);
+            padding: 40px;
+            text-align: center;
+        }
+
+        .footer p {
+            font-size: 14px;
+            opacity: 0.7;
+        }
+
+        .footer .tagline {
+            color: var(--vysus-stockholm-neon);
+            font-size: 16px;
+            font-weight: 400;
+            margin-top: 16px;
+            letter-spacing: 2px;
+            opacity: 1;
+        }
+
+        /* Print Styles */
+        @media print {
+            .header {
+                padding: 40px;
+            }
+
+            .question-card {
+                break-inside: avoid;
+            }
+
+            .score-input {
+                border: 1px solid var(--vysus-trondheim-night);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 32px;
+            }
+
+            .flags {
+                grid-template-columns: 1fr;
+            }
+
+            .score-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Password Protection Overlay */
+        .password-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--vysus-malmo-green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .password-box {
+            background: var(--vysus-white);
+            padding: 60px;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .password-box svg {
+            width: 60px;
+            margin-bottom: 30px;
+        }
+
+        .password-box h2 {
+            color: var(--vysus-malmo-green);
+            font-size: 24px;
+            font-weight: 400;
+            margin-bottom: 8px;
+        }
+
+        .password-box p {
+            color: var(--vysus-scandinavia-rock);
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        .password-input {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid var(--vysus-bergen-rain);
+            font-size: 16px;
+            font-family: var(--vysus-font-primary);
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .password-input:focus {
+            outline: none;
+            border-color: var(--vysus-stockholm-neon);
+        }
+
+        .password-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--vysus-stockholm-neon);
+            color: var(--vysus-malmo-green);
+            border: none;
+            font-size: 16px;
+            font-weight: 400;
+            font-family: var(--vysus-font-primary);
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .password-btn:hover {
+            background: var(--vysus-malmo-green);
+            color: var(--vysus-white);
+        }
+
+        .password-error {
+            color: #F92D63;
+            font-size: 14px;
+            margin-top: 16px;
+            display: none;
+        }
+
+        .protected-content {
+            display: none;
+        }
+
+        .protected-content.unlocked {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="password-overlay" id="passwordOverlay">
+        <div class="password-box">
+            <svg viewBox="0 0 100 112" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0 0 L38.7 112.2 L85 112.2 L46.2 0 Z" fill="#00E3A9"/>
+                <path d="M86.2 2.8 L74.8 10.9 L67.6 22.6 L65.7 36.1 L68.5 48.1 L76.9 59.8 L88.2 66.6 L100 68.6 L100 0 Z" fill="#00E3A9"/>
+            </svg>
+            <h2>Protected Content</h2>
+            <p>Enter password to access this document</p>
+            <input type="password" class="password-input" id="passwordInput" placeholder="Password" onkeypress="if(event.key==='Enter')checkPassword()">
+            <button class="password-btn" onclick="checkPassword()">Access Document</button>
+            <p class="password-error" id="passwordError">Incorrect password. Please try again.</p>
+        </div>
+    </div>
+
+    <div class="protected-content" id="protectedContent">
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <svg class="vysus-marque" viewBox="0 0 100 112" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M0 0 L38.7 112.2 L85 112.2 L46.2 0 Z" fill="#00E3A9"/>
+                    <path d="M86.2 2.8 L74.8 10.9 L67.6 22.6 L65.7 36.1 L68.5 48.1 L76.9 59.8 L88.2 66.6 L100 68.6 L100 0 Z" fill="#00E3A9"/>
+                </svg>
+                <span class="logo-text">VYSUS GROUP</span>
+            </div>
+            <h1>Recruiter Pre-Screening Guide</h1>
+            <p class="subtitle">Grid Connection Engineer Candidates</p>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="intro">
+            <h2>How to Use This Guide</h2>
+            <p>These aren't pass/fail tests - they're conversation starters. Listen for <strong>confidence</strong>, <strong>clarity</strong>, and <strong>relevant experience</strong>. Red flags include vague answers, blaming others, or inability to explain concepts simply. You're helping filter candidates before technical interviews, not conducting the technical assessment yourself.</p>
+        </div>
+
+        <!-- Fixed Bottom Scoring Bar -->
+        <div class="scoring-bar" id="scoringBar">
+            <div class="scoring-bar-inner">
+                <input type="text" class="candidate-name-input" id="candidateName" placeholder="Candidate Name">
+                <div class="score-chips">
+                    <div class="score-chip">
+                        <span class="chip-label">Conf</span>
+                        <span class="chip-value" id="confidenceTotal">0/10</span>
+                    </div>
+                    <div class="score-chip">
+                        <span class="chip-label">Lead</span>
+                        <span class="chip-value" id="leadershipTotal">0/15</span>
+                    </div>
+                    <div class="score-chip">
+                        <span class="chip-label">Tech</span>
+                        <span class="chip-value" id="technicalTotal">0/20</span>
+                    </div>
+                    <div class="score-chip total">
+                        <span class="chip-label">Total</span>
+                        <span class="chip-value" id="grandTotal">0/45</span>
+                    </div>
+                    <div class="pass-fail-indicator pending" id="passFail">Scoring...</div>
+                </div>
+                <div class="bar-actions">
+                    <button class="bar-btn save" onclick="saveResults()">Save</button>
+                    <button class="bar-btn email" onclick="emailResults()">Email</button>
+                </div>
+                <div class="summary-panel" id="summaryPanel">
+                    <div class="summary-content">
+                        <div class="summary-block strengths">
+                            <h5>Strengths</h5>
+                            <ul id="strengthsList"></ul>
+                        </div>
+                        <div class="summary-block concerns">
+                            <h5>Concerns</h5>
+                            <ul id="concernsList"></ul>
+                        </div>
+                        <div class="summary-block recommendation">
+                            <h5>Recommended Level</h5>
+                            <div class="rec-level" id="recLevel">-</div>
+                            <div class="rec-reasoning" id="recReasoning"></div>
+                            <div class="rec-caution" id="recCaution"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Role Progression -->
+        <div class="role-progression">
+            <div class="role-card">
+                <div class="role-card-header">
+                    <h3>Senior Engineer</h3>
+                    <div class="focus">Technical Delivery</div>
+                </div>
+                <div class="role-card-body">
+                    <ul>
+                        <li class="new-skill">Independent study delivery (R1/R2)</li>
+                        <li class="new-skill">Strong in 1-2 modelling tools (PSCAD, PSS/E)</li>
+                        <li class="new-skill">EMT & RMS simulation execution</li>
+                        <li class="new-skill">Grid code compliance assessment</li>
+                        <li class="new-skill">Model validation & tuning</li>
+                        <li class="new-skill">Technical report writing</li>
+                        <li>Developing client communication</li>
+                        <li>Contributes to team knowledge</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="role-card lead">
+                <div class="role-card-header">
+                    <h3>Lead Engineer</h3>
+                    <div class="focus">Technical Leadership</div>
+                </div>
+                <div class="role-card-body">
+                    <ul>
+                        <li>All Senior responsibilities plus:</li>
+                        <li class="new-skill">Mentors and develops engineers</li>
+                        <li class="new-skill">Project leadership & oversight</li>
+                        <li class="new-skill">Direct NSP/AEMO engagement</li>
+                        <li class="new-skill">Project budget management</li>
+                        <li class="new-skill">Client relationship ownership</li>
+                        <li class="new-skill">Technical review & QA sign-off</li>
+                        <li class="new-skill">Scope definition & proposal input</li>
+                        <li class="new-skill">Multi-project coordination</li>
+                        <li class="new-skill">Technical risk assessment</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="role-card principal">
+                <div class="role-card-header">
+                    <h3>Principal Engineer</h3>
+                    <div class="focus">Strategic Leadership</div>
+                </div>
+                <div class="role-card-body">
+                    <ul>
+                        <li>All Lead responsibilities plus:</li>
+                        <li class="new-skill">Strategic oversight across projects</li>
+                        <li class="new-skill">Business development & growth</li>
+                        <li class="new-skill">Senior client advisory</li>
+                        <li class="new-skill">Team capacity & capability planning</li>
+                        <li class="new-skill">Guides Leads on complex decisions</li>
+                        <li class="new-skill">Industry thought leadership</li>
+                        <li class="new-skill">Proposal strategy & pricing oversight</li>
+                        <li class="new-skill">Market positioning & service offering</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Leadership expectation bracket -->
+        <div class="leadership-bracket">
+            <div class="bracket-visual">
+                <div class="bracket-arm left"></div>
+                <div class="bracket-stem"></div>
+                <div class="bracket-arm right"></div>
+            </div>
+            <div class="bracket-message">
+                <p>Our Leads and Principals don't just manage work - they drive it. They bring personal investment to every project, set the standard for technical excellence, and lift the people around them. We're looking for engineers who go beyond the brief because they genuinely care about the outcome - people who are strong within themselves, back their expertise, and lead by example. That's what sets our people apart.</p>
+            </div>
+        </div>
+
+        <!-- Part 1: Confidence -->
+        <section class="section">
+            <div class="section-header">
+                <div class="section-number">1</div>
+                <h2 class="section-title">Confidence Indicators</h2>
+            </div>
+
+            <div class="question-card">
+                <div class="question-header">
+                    <span class="question-id">Q1</span>
+                    <span class="question-text">"Tell me about the most complex grid connection project you've worked on."</span>
+                </div>
+                <div class="question-body">
+                    <div class="question-content">
+                        <div class="listen-for">
+                            <h4>Listen For</h4>
+                            <ul>
+                                <li>Do they own their contribution or hide behind the team?</li>
+                                <li>Can they explain it simply without jargon-dumping?</li>
+                                <li>Do they mention specific outcomes (MW size, timeframes, challenges overcome)?</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="question-right">
+                        <div class="flags">
+                            <div class="flag-box green">
+                                <h5>Green</h5>
+                                <p>"I led...", "We faced X and I solved it by..."</p>
+                            </div>
+                            <div class="flag-box red">
+                                <h5>Red</h5>
+                                <p>Vague, can't quantify, blames others</p>
+                            </div>
+                        </div>
+                        <div class="question-sidebar">
+                            <span class="level-tag principal">Principal</span>
+                            <span class="level-tag lead">Lead</span>
+                            <span class="level-tag senior">Senior</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="question-score">
+                    <button class="score-btn concern" data-category="confidence" data-value="1" onclick="selectScore(this)">Concern</button>
+                    <button class="score-btn ok" data-category="confidence" data-value="3" onclick="selectScore(this)">OK</button>
+                    <button class="score-btn strong" data-category="confidence" data-value="5" onclick="selectScore(this)">Strong</button>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <div class="question-header">
+                    <span class="question-id">Q2</span>
+                    <span class="question-text">"What software tools are you most confident using?"</span>
+                </div>
+                <div class="question-body">
+                    <div class="question-content">
+                        <div class="listen-for">
+                            <h4>Listen For</h4>
+                            <ul>
+                                <li>Specific tools: PSCAD, PSS/E, DIgSILENT, Python</li>
+                                <li>Honest about gaps vs. overselling everything</li>
+                                <li>Willingness to learn what they don't know</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="question-right">
+                        <div class="flags">
+                            <div class="flag-box green">
+                                <h5>Green</h5>
+                                <p>"Strong in X, learning Y, need training on Z"</p>
+                            </div>
+                            <div class="flag-box red">
+                                <h5>Red</h5>
+                                <p>Claims expert in everything, dismissive</p>
+                            </div>
+                        </div>
+                        <div class="question-sidebar">
+                            <span class="level-tag principal">Principal</span>
+                            <span class="level-tag lead">Lead</span>
+                            <span class="level-tag senior">Senior</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="question-score">
+                    <button class="score-btn concern" data-category="confidence" data-value="1" onclick="selectScore(this)">Concern</button>
+                    <button class="score-btn ok" data-category="confidence" data-value="3" onclick="selectScore(this)">OK</button>
+                    <button class="score-btn strong" data-category="confidence" data-value="5" onclick="selectScore(this)">Strong</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Part 2: Leadership -->
+        <section class="section">
+            <div class="section-header">
+                <div class="section-number">2</div>
+                <h2 class="section-title">Leadership & Management</h2>
+            </div>
+
+            <div class="question-card">
+                <div class="question-header">
+                    <span class="question-id">Q3</span>
+                    <span class="question-text">"If two engineers on your team were struggling with a technical task and the deadline was tight, what would you do?"</span>
+                </div>
+                <div class="question-body">
+                    <div class="question-content">
+                        <div class="listen-for">
+                            <h4>Good Answers Include</h4>
+                            <ul>
+                                <li>Pair them with experienced team members</li>
+                                <li>Adjust timeline realistically</li>
+                                <li>Take accountability for team delivery</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="question-right">
+                        <div class="flags">
+                            <div class="flag-box green">
+                                <h5>Green</h5>
+                                <p>Mentoring mindset, realistic, takes ownership</p>
+                            </div>
+                            <div class="flag-box red">
+                                <h5>Red</h5>
+                                <p>"I'd do it myself" or "Replace them"</p>
+                            </div>
+                        </div>
+                        <div class="question-sidebar">
+                            <span class="level-tag principal">Principal</span>
+                            <span class="level-tag lead">Lead</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="question-score">
+                    <button class="score-btn concern" data-category="leadership" data-value="1" onclick="selectScore(this)">Concern</button>
+                    <button class="score-btn ok" data-category="leadership" data-value="3" onclick="selectScore(this)">OK</button>
+                    <button class="score-btn strong" data-category="leadership" data-value="5" onclick="selectScore(this)">Strong</button>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <div class="question-header">
+                    <span class="question-id">Q4</span>
+                    <span class="question-text">"Tell me about a time a client disagreed with your technical findings."</span>
+                </div>
+                <div class="question-body">
+                    <div class="question-content">
+                        <div class="listen-for">
+                            <h4>Good Answers Include</h4>
+                            <ul>
+                                <li>Stood by their analysis with evidence</li>
+                                <li>Offered to explain methodology</li>
+                                <li>Professional under pressure</li>
+                                <li>Open to peer review</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="question-right">
+                        <div class="flags">
+                            <div class="flag-box green">
+                                <h5>Green</h5>
+                                <p>Evidence-backed confidence, open to scrutiny</p>
+                            </div>
+                            <div class="flag-box red">
+                                <h5>Red</h5>
+                                <p>Caved to pressure, defensive, refused to discuss</p>
+                            </div>
+                        </div>
+                        <div class="question-sidebar">
+                            <span class="level-tag principal">Principal</span>
+                            <span class="level-tag lead">Lead</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="question-score">
+                    <button class="score-btn concern" data-category="leadership" data-value="1" onclick="selectScore(this)">Concern</button>
+                    <button class="score-btn ok" data-category="leadership" data-value="3" onclick="selectScore(this)">OK</button>
+                    <button class="score-btn strong" data-category="leadership" data-value="5" onclick="selectScore(this)">Strong</button>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <div class="question-header">
+                    <span class="question-id">Q5</span>
+                    <span class="question-text">"Have you ever found an error in work that had already been submitted? What did you do?"</span>
+                </div>
+                <div class="question-body">
+                    <div class="question-content">
+                        <div class="listen-for">
+                            <h4>Good Answers Include</h4>
+                            <ul>
+                                <li>Told the client/stakeholder immediately</li>
+                                <li>Took responsibility (not blamed juniors)</li>
+                                <li>Fixed it and prevented recurrence</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="question-right">
+                        <div class="flags">
+                            <div class="flag-box green">
+                                <h5>Green</h5>
+                                <p>Transparency, accountability, process improvement</p>
+                            </div>
+                            <div class="flag-box red">
+                                <h5>Red</h5>
+                                <p>Hid it, blamed others, minimized</p>
+                            </div>
+                        </div>
+                        <div class="question-sidebar">
+                            <span class="level-tag principal">Principal</span>
+                            <span class="level-tag lead">Lead</span>
+                            <span class="level-tag senior">Senior</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="question-score">
+                    <button class="score-btn concern" data-category="leadership" data-value="1" onclick="selectScore(this)">Concern</button>
+                    <button class="score-btn ok" data-category="leadership" data-value="3" onclick="selectScore(this)">OK</button>
+                    <button class="score-btn strong" data-category="leadership" data-value="5" onclick="selectScore(this)">Strong</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Part 3: Technical -->
+        <section class="section">
+            <div class="section-header">
+                <div class="section-number">3</div>
+                <h2 class="section-title">Technical Foundations</h2>
+            </div>
+
+            <div class="question-card">
+                <div class="question-header">
+                    <span class="question-id">Q6</span>
+                    <span class="question-text">"What's the difference between Grid-Following and Grid-Forming inverters?"</span>
+                </div>
+                <div class="question-body">
+                    <div class="question-content">
+                        <div class="listen-for">
+                            <h4>They Should Mention</h4>
+                            <ul>
+                                <li><strong>GFL:</strong> follows grid voltage/frequency (needs strong grid)</li>
+                                <li><strong>GFM:</strong> creates own reference (works in weak grids)</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="question-right">
+                        <div class="flags">
+                            <div class="flag-box green">
+                                <h5>Bonus</h5>
+                                <p>Weak grid challenges, system strength experience</p>
+                            </div>
+                            <div class="flag-box red">
+                                <h5>Red</h5>
+                                <p>Never heard of GFM/GFL distinction</p>
+                            </div>
+                        </div>
+                        <div class="question-sidebar">
+                            <span class="level-tag principal">Principal</span>
+                            <span class="level-tag lead">Lead</span>
+                            <span class="level-tag senior">Senior</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="question-score">
+                    <button class="score-btn concern" data-category="technical" data-value="1" onclick="selectScore(this)">Concern</button>
+                    <button class="score-btn ok" data-category="technical" data-value="3" onclick="selectScore(this)">OK</button>
+                    <button class="score-btn strong" data-category="technical" data-value="5" onclick="selectScore(this)">Strong</button>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <div class="question-header">
+                    <span class="question-id">Q7</span>
+                    <span class="question-text">"What does SCR mean and why does it matter?"</span>
+                </div>
+                <div class="question-body">
+                    <div class="question-content">
+                        <div class="listen-for">
+                            <h4>They Should Mention</h4>
+                            <ul>
+                                <li>Short Circuit Ratio</li>
+                                <li>Measures grid strength at connection point</li>
+                                <li>Low SCR = weak grid = instability risk</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="question-right">
+                        <div class="flags">
+                            <div class="flag-box green">
+                                <h5>Green</h5>
+                                <p>General understanding of concept and importance</p>
+                            </div>
+                            <div class="flag-box red">
+                                <h5>Red</h5>
+                                <p>Never heard of it (fundamental concept)</p>
+                            </div>
+                        </div>
+                        <div class="question-sidebar">
+                            <span class="level-tag principal">Principal</span>
+                            <span class="level-tag lead">Lead</span>
+                            <span class="level-tag senior">Senior</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="question-score">
+                    <button class="score-btn concern" data-category="technical" data-value="1" onclick="selectScore(this)">Concern</button>
+                    <button class="score-btn ok" data-category="technical" data-value="3" onclick="selectScore(this)">OK</button>
+                    <button class="score-btn strong" data-category="technical" data-value="5" onclick="selectScore(this)">Strong</button>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <div class="question-header">
+                    <span class="question-id">Q8</span>
+                    <span class="question-text">"Can you explain what an R1 study involves?"</span>
+                </div>
+                <div class="question-body">
+                    <div class="question-content">
+                        <div class="listen-for">
+                            <h4>They Should Mention</h4>
+                            <ul>
+                                <li>Model-based study (simulation)</li>
+                                <li>Demonstrates grid code compliance</li>
+                                <li>Done before commissioning</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="question-right">
+                        <div class="flags">
+                            <div class="flag-box green">
+                                <h5>Bonus</h5>
+                                <p>PSCAD/PSS/E, NER clauses, GPS, DMNT</p>
+                            </div>
+                            <div class="flag-box red">
+                                <h5>Red</h5>
+                                <p>Confuses R1 with R2, no connection study experience</p>
+                            </div>
+                        </div>
+                        <div class="question-sidebar">
+                            <span class="level-tag principal">Principal</span>
+                            <span class="level-tag lead">Lead</span>
+                            <span class="level-tag senior">Senior</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="question-score">
+                    <button class="score-btn concern" data-category="technical" data-value="1" onclick="selectScore(this)">Concern</button>
+                    <button class="score-btn ok" data-category="technical" data-value="3" onclick="selectScore(this)">OK</button>
+                    <button class="score-btn strong" data-category="technical" data-value="5" onclick="selectScore(this)">Strong</button>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <div class="question-header">
+                    <span class="question-id">Q9</span>
+                    <span class="question-text">"What's a PPC and what does it do?"</span>
+                </div>
+                <div class="question-body">
+                    <div class="question-content">
+                        <div class="listen-for">
+                            <h4>They Should Mention</h4>
+                            <ul>
+                                <li>Plant Primary Controller / Power Plant Controller</li>
+                                <li>Coordinates all inverters in a plant</li>
+                                <li>Manages output at connection point</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="question-right">
+                        <div class="flags">
+                            <div class="flag-box green">
+                                <h5>Bonus</h5>
+                                <p>P/Q control, voltage regulation, tuning experience</p>
+                            </div>
+                            <div class="flag-box red">
+                                <h5>Red</h5>
+                                <p>Doesn't know what PPC stands for</p>
+                            </div>
+                        </div>
+                        <div class="question-sidebar">
+                            <span class="level-tag principal">Principal</span>
+                            <span class="level-tag lead">Lead</span>
+                            <span class="level-tag senior">Senior</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="question-score">
+                    <button class="score-btn concern" data-category="technical" data-value="1" onclick="selectScore(this)">Concern</button>
+                    <button class="score-btn ok" data-category="technical" data-value="3" onclick="selectScore(this)">OK</button>
+                    <button class="score-btn strong" data-category="technical" data-value="5" onclick="selectScore(this)">Strong</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Reference -->
+        <section class="section">
+            <div class="section-header">
+                <div class="section-number">4</div>
+                <h2 class="section-title">Quick Reference</h2>
+            </div>
+
+            <table class="reference-table">
+                <thead>
+                    <tr>
+                        <th>Trait</th>
+                        <th>Green Flags</th>
+                        <th>Red Flags</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="trait">Confidence</td>
+                        <td>Clear explanations, owns their work, admits gaps honestly</td>
+                        <td>Vague, defensive, over-claims expertise</td>
+                    </tr>
+                    <tr>
+                        <td class="trait">Leadership</td>
+                        <td>Develops others, takes accountability, composure with clients</td>
+                        <td>Micromanages, blames team, avoids conflict</td>
+                    </tr>
+                    <tr>
+                        <td class="trait">Technical</td>
+                        <td>Knows fundamentals, mentions specific tools/projects</td>
+                        <td>Can't explain basics, never heard of key terms</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="pass-criteria" style="margin-top: 30px;">
+                <strong>Pass to technical interview if:</strong> 32/45 (70%+) with no major red flags
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>Recruiter Pre-Screening Guide | Grid Connection Engineer Candidates</p>
+        <p class="tagline">Ingenuity. Imagination. Insight.</p>
+    </footer>
+    </div>
+
+    <script>
+        function checkPassword() {
+            const input = document.getElementById('passwordInput');
+            const overlay = document.getElementById('passwordOverlay');
+            const content = document.getElementById('protectedContent');
+            const error = document.getElementById('passwordError');
+
+            if (input.value === 'vysus2026') {
+                overlay.style.display = 'none';
+                content.classList.add('unlocked');
+                sessionStorage.setItem('authenticated', 'true');
+            } else {
+                error.style.display = 'block';
+                input.value = '';
+                input.focus();
+            }
+        }
+
+        // Check if already authenticated in this session
+        if (sessionStorage.getItem('authenticated') === 'true') {
+            document.getElementById('passwordOverlay').style.display = 'none';
+            document.getElementById('protectedContent').classList.add('unlocked');
+        }
+
+        // Add score dots to all question headers
+        document.querySelectorAll('.question-header').forEach((header, i) => {
+            const dots = document.createElement('div');
+            dots.className = 'score-dots';
+            dots.id = 'dots-' + i;
+            dots.innerHTML = '<span class="score-dot"></span><span class="score-dot"></span><span class="score-dot"></span><span class="score-dot"></span><span class="score-dot"></span>';
+            header.appendChild(dots);
+        });
+
+        // Scoring functionality
+        function selectScore(btn) {
+            // Deselect siblings
+            const parent = btn.parentElement;
+            parent.querySelectorAll('.score-btn').forEach(b => b.classList.remove('selected'));
+            // Select this one
+            btn.classList.add('selected');
+            // Update dots on question header
+            const card = btn.closest('.question-card');
+            if (card) {
+                const dots = card.querySelector('.score-dots');
+                if (dots) dots.setAttribute('data-score', btn.dataset.value);
+            }
+            // Update totals
+            updateScores();
+        }
+
+        function updateScores() {
+            const selected = document.querySelectorAll('.score-btn.selected');
+            let confidence = 0, leadership = 0, technical = 0;
+            let questionsScored = selected.length;
+
+            selected.forEach(btn => {
+                const val = parseInt(btn.dataset.value);
+                const cat = btn.dataset.category;
+                if (cat === 'confidence') confidence += val;
+                else if (cat === 'leadership') leadership += val;
+                else if (cat === 'technical') technical += val;
+            });
+
+            const total = confidence + leadership + technical;
+            const maxScore = 45;
+            const percent = Math.round((total / maxScore) * 100);
+
+            document.getElementById('confidenceTotal').textContent = confidence + '/10';
+            document.getElementById('leadershipTotal').textContent = leadership + '/15';
+            document.getElementById('technicalTotal').textContent = technical + '/20';
+            document.getElementById('grandTotal').textContent = total + '/' + maxScore;
+
+            // Update pass/fail indicator
+            const indicator = document.getElementById('passFail');
+            if (questionsScored >= 5) {
+                if (percent >= 70) {
+                    indicator.className = 'pass-fail-indicator pass';
+                    indicator.textContent = 'PASS (' + percent + '%)';
+                } else {
+                    indicator.className = 'pass-fail-indicator fail';
+                    indicator.textContent = 'FAIL (' + percent + '%)';
+                }
+            } else {
+                indicator.className = 'pass-fail-indicator pending';
+                indicator.textContent = questionsScored + '/9 scored';
+            }
+
+            // Show bar when scoring begins
+            if (questionsScored > 0) {
+                document.getElementById('scoringBar').classList.add('visible');
+            }
+
+            // Generate summary when enough questions scored
+            if (questionsScored >= 5) {
+                generateSummary(confidence, leadership, technical, questionsScored);
+            }
+        }
+
+        function generateSummary(confidence, leadership, technical, questionsScored) {
+            const panel = document.getElementById('summaryPanel');
+            const strengthsList = document.getElementById('strengthsList');
+            const concernsList = document.getElementById('concernsList');
+            const recLevel = document.getElementById('recLevel');
+            const recReasoning = document.getElementById('recReasoning');
+            const recCaution = document.getElementById('recCaution');
+
+            // Question labels mapped to categories and what they indicate
+            const questionMap = [
+                { id: 0, label: 'Project ownership & complexity', category: 'confidence', seniorReq: true, leadReq: true, principalReq: true },
+                { id: 1, label: 'Software tool proficiency', category: 'confidence', seniorReq: true, leadReq: true, principalReq: false },
+                { id: 2, label: 'Team mentoring & management', category: 'leadership', seniorReq: false, leadReq: true, principalReq: true },
+                { id: 3, label: 'Client relationship & composure', category: 'leadership', seniorReq: false, leadReq: true, principalReq: true },
+                { id: 4, label: 'Accountability & error handling', category: 'leadership', seniorReq: true, leadReq: true, principalReq: true },
+                { id: 5, label: 'GFL/GFM inverter knowledge', category: 'technical', seniorReq: true, leadReq: true, principalReq: true },
+                { id: 6, label: 'System strength (SCR) understanding', category: 'technical', seniorReq: true, leadReq: true, principalReq: true },
+                { id: 7, label: 'R1 study process knowledge', category: 'technical', seniorReq: true, leadReq: true, principalReq: true },
+                { id: 8, label: 'PPC functionality understanding', category: 'technical', seniorReq: true, leadReq: true, principalReq: true }
+            ];
+
+            // Get individual question scores
+            const scoreCards = document.querySelectorAll('.question-score');
+            const scores = [];
+            scoreCards.forEach((card, i) => {
+                const sel = card.querySelector('.score-btn.selected');
+                scores.push(sel ? parseInt(sel.dataset.value) : null);
+            });
+
+            // Build strengths and concerns
+            const strengths = [];
+            const concerns = [];
+
+            scores.forEach((score, i) => {
+                if (score === null) return;
+                if (score === 5) strengths.push(questionMap[i].label);
+                if (score === 1) concerns.push(questionMap[i].label);
+            });
+
+            // Category-level assessments
+            const confPercent = (confidence / 10) * 100;
+            const leadPercent = (leadership / 15) * 100;
+            const techPercent = (technical / 20) * 100;
+
+            if (confPercent >= 80 && strengths.indexOf('Project ownership & complexity') === -1) {
+                strengths.unshift('Strong confidence & communication');
+            }
+            if (techPercent >= 80 && strengths.length < 4) {
+                strengths.push('Solid technical foundations');
+            }
+            if (leadPercent >= 80 && strengths.length < 4) {
+                strengths.push('Clear leadership capability');
+            }
+
+            if (confPercent <= 40) concerns.push('Weak confidence signals');
+            if (techPercent <= 40) concerns.push('Technical gaps - needs development');
+            if (leadPercent <= 40 && questionsScored >= 7) concerns.push('Limited leadership evidence');
+
+            // Determine recommended level
+            let level = '';
+            let reasoning = '';
+            let caution = '';
+
+            const hasConcernInTech = scores[5] === 1 || scores[6] === 1 || scores[7] === 1 || scores[8] === 1;
+            const hasConcernInLead = scores[2] === 1 || scores[3] === 1;
+            const allTechStrong = scores.slice(5, 9).every(s => s === 5 || s === null);
+            const allLeadStrong = scores.slice(2, 5).every(s => s === 5 || s === null);
+
+            if (techPercent >= 75 && leadPercent >= 80 && confPercent >= 80 && !hasConcernInTech && !hasConcernInLead) {
+                level = 'Principal Engineer';
+                reasoning = 'Strong across all dimensions. Demonstrates technical depth, leadership maturity, and confident communication needed for strategic-level delivery.';
+                if (scores[2] === 3) caution = 'Probe mentoring depth further in technical interview.';
+            } else if (techPercent >= 60 && leadPercent >= 60 && confPercent >= 60 && !hasConcernInTech) {
+                level = 'Lead Engineer';
+                reasoning = 'Good technical base with demonstrated leadership and client-facing ability. Suitable for project ownership and team coordination.';
+                if (hasConcernInLead) caution = 'Leadership area has a concern flag - verify mentoring/client skills in next round.';
+            } else if (techPercent >= 50 && confPercent >= 50) {
+                level = 'Senior Engineer';
+                reasoning = 'Solid technical delivery capability. Focus on independent study execution and tool proficiency rather than leadership scope.';
+                if (hasConcernInTech) caution = 'Technical concern flagged - confirm core simulation competence in technical interview.';
+                if (leadPercent >= 60) reasoning += ' Shows leadership potential for future development into Lead role.';
+            } else {
+                level = 'Below Senior threshold';
+                reasoning = 'Scores indicate gaps in core areas. May need more experience before Senior-level responsibilities.';
+                caution = 'Consider whether a more junior role or additional screening is appropriate.';
+            }
+
+            // Render
+            strengthsList.innerHTML = strengths.length > 0
+                ? strengths.map(s => '<li>' + s + '</li>').join('')
+                : '<li style="color: var(--vysus-bergen-rain);">No strong signals yet</li>';
+
+            concernsList.innerHTML = concerns.length > 0
+                ? concerns.map(c => '<li>' + c + '</li>').join('')
+                : '<li style="color: var(--vysus-stockholm-neon);">No concerns flagged</li>';
+
+            recLevel.textContent = level;
+            recReasoning.textContent = reasoning;
+            recCaution.textContent = caution;
+
+            panel.classList.add('visible');
+        }
+
+        function getResultsText() {
+            const name = document.getElementById('candidateName').value || 'Unnamed Candidate';
+            const date = new Date().toLocaleDateString();
+            const confidence = document.getElementById('confidenceTotal').textContent;
+            const leadership = document.getElementById('leadershipTotal').textContent;
+            const technical = document.getElementById('technicalTotal').textContent;
+            const total = document.getElementById('grandTotal').textContent;
+            const passFail = document.getElementById('passFail').textContent;
+
+            // Get per-question details
+            const questions = ['Q1: Project complexity', 'Q2: Software tools', 'Q3: Team management', 'Q4: Client disagreement', 'Q5: Error handling', 'Q6: GFL vs GFM', 'Q7: SCR', 'Q8: R1 studies', 'Q9: PPC'];
+            let details = '';
+            document.querySelectorAll('.question-score').forEach((score, i) => {
+                const sel = score.querySelector('.score-btn.selected');
+                const rating = sel ? sel.textContent : 'Not scored';
+                details += `  ${questions[i]}: ${rating}\n`;
+            });
+
+            // Get summary info
+            const recLevel = document.getElementById('recLevel').textContent;
+            const recReasoning = document.getElementById('recReasoning').textContent;
+            const recCaution = document.getElementById('recCaution').textContent;
+            const strengthItems = Array.from(document.querySelectorAll('#strengthsList li')).map(li => li.textContent);
+            const concernItems = Array.from(document.querySelectorAll('#concernsList li')).map(li => li.textContent);
+
+            let summary = '';
+            if (recLevel && recLevel !== '-') {
+                summary = `\nASSESSMENT SUMMARY:\n` +
+                    `Recommended Level: ${recLevel}\n` +
+                    `${recReasoning}\n` +
+                    (recCaution ? `Note: ${recCaution}\n` : '') +
+                    `\nStrengths: ${strengthItems.join(', ')}\n` +
+                    `Concerns: ${concernItems.join(', ')}\n`;
+            }
+
+            return `CANDIDATE SCREENING RESULTS\n` +
+                `================================\n` +
+                `Candidate: ${name}\n` +
+                `Date: ${date}\n` +
+                `Result: ${passFail}\n\n` +
+                `SCORES:\n` +
+                `- Confidence & Communication: ${confidence}\n` +
+                `- Leadership & Management: ${leadership}\n` +
+                `- Technical Foundations: ${technical}\n` +
+                `- TOTAL: ${total}\n\n` +
+                `DETAIL:\n${details}\n` +
+                summary +
+                `\nPass threshold: 70%+ with no major red flags\n` +
+                `\n---\nVysus Group | Grid Connection Engineer Screening`;
+        }
+
+        function saveResults() {
+            const name = document.getElementById('candidateName').value || 'Unnamed_Candidate';
+            const date = new Date().toLocaleDateString().replace(/\//g, '-');
+            const results = getResultsText();
+
+            const blob = new Blob([results], {type: 'text/plain'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `screening_${name.replace(/\s+/g, '_')}_${date}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function emailResults() {
+            const name = document.getElementById('candidateName').value || 'Candidate';
+            const subject = encodeURIComponent(`Screening Result: ${name} - Grid Connection Engineer`);
+            const body = encodeURIComponent(getResultsText());
+            window.location.href = `mailto:?subject=${subject}&body=${body}`;
+        }
+    </script>
+</body>
+</html>

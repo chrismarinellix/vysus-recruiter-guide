@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grid Connection Engineer | Candidate Brief | Vysus Group</title>
+    <style>
+        :root {
+            --vysus-stockholm-neon: #00E3A9;
+            --vysus-malmo-green: #005454;
+            --vysus-white: #FFFFFF;
+            --vysus-oslo-snow: #F8F8F8;
+            --vysus-stavanger-ice: #EDEDED;
+            --vysus-bergen-rain: #DADADA;
+            --vysus-scandinavia-rock: #485559;
+            --vysus-trondheim-night: #1D1D1B;
+            --vysus-font-primary: 'Segoe UI', Arial, sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--vysus-font-primary);
+            font-weight: 300;
+            color: var(--vysus-trondheim-night);
+            line-height: 1.5;
+            background: var(--vysus-white);
+        }
+
+        .header {
+            background: var(--vysus-malmo-green);
+            padding: 50px 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 60%;
+            height: 200%;
+            background: var(--vysus-stockholm-neon);
+            transform: skewX(-15deg);
+            opacity: 0.15;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .logo svg { width: 45px; }
+        .logo-text {
+            color: var(--vysus-white);
+            font-size: 20px;
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+
+        .header h1 {
+            color: var(--vysus-white);
+            font-size: 36px;
+            font-weight: 300;
+            margin-bottom: 12px;
+        }
+
+        .header .subtitle {
+            color: var(--vysus-stockholm-neon);
+            font-size: 18px;
+        }
+
+        .main {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 50px 40px;
+        }
+
+        .intro {
+            background: var(--vysus-oslo-snow);
+            padding: 30px;
+            margin-bottom: 40px;
+            border-left: 4px solid var(--vysus-stockholm-neon);
+        }
+
+        .intro h2 {
+            color: var(--vysus-malmo-green);
+            font-size: 20px;
+            font-weight: 400;
+            margin-bottom: 12px;
+        }
+
+        .intro p {
+            color: var(--vysus-scandinavia-rock);
+            font-size: 15px;
+            margin-bottom: 12px;
+        }
+
+        .intro p:last-child { margin-bottom: 0; }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h3 {
+            color: var(--vysus-malmo-green);
+            font-size: 22px;
+            font-weight: 400;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--vysus-stavanger-ice);
+        }
+
+        .topic-card {
+            background: var(--vysus-white);
+            border: 1px solid var(--vysus-bergen-rain);
+            margin-bottom: 16px;
+            padding: 24px;
+        }
+
+        .topic-card h4 {
+            color: var(--vysus-malmo-green);
+            font-size: 16px;
+            font-weight: 400;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .topic-card h4::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--vysus-stockholm-neon);
+        }
+
+        .topic-card p {
+            color: var(--vysus-scandinavia-rock);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .topic-card ul {
+            list-style: none;
+            padding-left: 20px;
+            margin-top: 10px;
+        }
+
+        .topic-card li {
+            color: var(--vysus-scandinavia-rock);
+            font-size: 14px;
+            padding: 4px 0;
+            position: relative;
+        }
+
+        .topic-card li::before {
+            content: '-';
+            position: absolute;
+            left: -15px;
+            color: var(--vysus-stockholm-neon);
+        }
+
+        .highlight-box {
+            background: rgba(0, 227, 169, 0.1);
+            border-left: 3px solid var(--vysus-stockholm-neon);
+            padding: 20px 24px;
+            margin-top: 30px;
+        }
+
+        .highlight-box h4 {
+            color: var(--vysus-malmo-green);
+            font-size: 14px;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .highlight-box p {
+            color: var(--vysus-trondheim-night);
+            font-size: 15px;
+        }
+
+        /* Role Progression */
+        .role-progression {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .role-card {
+            background: var(--vysus-white);
+            border: 2px solid var(--vysus-bergen-rain);
+        }
+
+        .role-card.lead {
+            border-color: rgba(0, 227, 169, 0.4);
+        }
+
+        .role-card.principal {
+            border-color: var(--vysus-stockholm-neon);
+        }
+
+        .role-card-header {
+            padding: 16px 20px;
+            background: var(--vysus-stavanger-ice);
+            border-bottom: 2px solid var(--vysus-bergen-rain);
+        }
+
+        .role-card.lead .role-card-header {
+            background: rgba(0, 227, 169, 0.15);
+            border-bottom-color: rgba(0, 227, 169, 0.4);
+        }
+
+        .role-card.principal .role-card-header {
+            background: var(--vysus-stockholm-neon);
+            border-bottom-color: var(--vysus-stockholm-neon);
+        }
+
+        .role-card-header h4 {
+            font-size: 16px;
+            font-weight: 400;
+            color: var(--vysus-malmo-green);
+            margin: 0;
+        }
+
+        .role-card-header .focus {
+            font-size: 11px;
+            color: var(--vysus-scandinavia-rock);
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .role-card.principal .role-card-header .focus {
+            color: var(--vysus-malmo-green);
+        }
+
+        .role-card-body {
+            padding: 16px 20px;
+        }
+
+        .role-card-body ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .role-card-body li {
+            padding: 6px 0;
+            font-size: 13px;
+            color: var(--vysus-scandinavia-rock);
+            border-bottom: 1px solid var(--vysus-stavanger-ice);
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .role-card-body li:last-child {
+            border-bottom: none;
+        }
+
+        .role-card-body li::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: var(--vysus-stockholm-neon);
+            margin-top: 6px;
+            flex-shrink: 0;
+        }
+
+        /* Leadership bracket */
+        .leadership-bracket {
+            margin-top: -8px;
+            margin-bottom: 0;
+            padding-left: calc(33.33% + 8px);
+        }
+
+        .bracket-visual {
+            display: flex;
+            align-items: flex-start;
+            height: 30px;
+            position: relative;
+        }
+
+        .bracket-arm {
+            flex: 1;
+            height: 16px;
+            border-bottom: 3px solid var(--vysus-stockholm-neon);
+        }
+
+        .bracket-arm.left {
+            border-left: 3px solid var(--vysus-stockholm-neon);
+            border-bottom-left-radius: 6px;
+        }
+
+        .bracket-arm.right {
+            border-right: 3px solid var(--vysus-stockholm-neon);
+            border-bottom-right-radius: 6px;
+        }
+
+        .bracket-stem {
+            width: 3px;
+            height: 30px;
+            background: var(--vysus-stockholm-neon);
+            position: absolute;
+            left: 50%;
+            top: 16px;
+        }
+
+        .bracket-message {
+            margin-top: 16px;
+            padding: 20px 24px;
+            background: var(--vysus-oslo-snow);
+            border-left: 4px solid var(--vysus-stockholm-neon);
+        }
+
+        .bracket-message p {
+            font-size: 14px;
+            color: var(--vysus-scandinavia-rock);
+            line-height: 1.6;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .role-progression {
+                grid-template-columns: 1fr;
+            }
+
+            .leadership-bracket {
+                padding-left: 0;
+                display: none;
+            }
+        }
+
+        .footer {
+            background: var(--vysus-trondheim-night);
+            color: var(--vysus-white);
+            padding: 30px;
+            text-align: center;
+        }
+
+        .footer p {
+            font-size: 13px;
+            opacity: 0.7;
+        }
+
+        .footer .tagline {
+            color: var(--vysus-stockholm-neon);
+            font-size: 14px;
+            margin-top: 12px;
+            letter-spacing: 2px;
+            opacity: 1;
+        }
+
+        @media print {
+            .header { padding: 30px; }
+            .main { padding: 30px; }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 { font-size: 28px; }
+            .main { padding: 30px 20px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <svg viewBox="0 0 100 112" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M0 0 L38.7 112.2 L85 112.2 L46.2 0 Z" fill="#00E3A9"/>
+                    <path d="M86.2 2.8 L74.8 10.9 L67.6 22.6 L65.7 36.1 L68.5 48.1 L76.9 59.8 L88.2 66.6 L100 68.6 L100 0 Z" fill="#00E3A9"/>
+                </svg>
+                <span class="logo-text">VYSUS GROUP</span>
+            </div>
+            <h1>Grid Connection Engineer</h1>
+            <p class="subtitle">Candidate Brief - What We're Looking For</p>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="intro">
+            <h2>About This Role</h2>
+            <p>We're looking for experienced Grid Connection Engineers to join our growing team. This brief outlines the key technical areas and competencies we'll be discussing during the recruitment process.</p>
+            <p>Please review these topics before your screening conversation - it will help us have a focused and productive discussion about your experience.</p>
+        </div>
+
+        <!-- Role Progression -->
+        <section class="section">
+            <h3>Role Expectations</h3>
+
+            <div class="role-progression">
+                <div class="role-card">
+                    <div class="role-card-header">
+                        <h4>Senior Engineer</h4>
+                        <div class="focus">Technical Delivery</div>
+                    </div>
+                    <div class="role-card-body">
+                        <ul>
+                            <li>Independent study delivery (R1/R2)</li>
+                            <li>Strong in 1-2 modelling tools (PSCAD, PSS/E)</li>
+                            <li>EMT & RMS simulation execution</li>
+                            <li>Grid code compliance assessment</li>
+                            <li>Model validation & tuning</li>
+                            <li>Technical report writing</li>
+                            <li>Developing client communication</li>
+                            <li>Contributes to team knowledge</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="role-card lead">
+                    <div class="role-card-header">
+                        <h4>Lead Engineer</h4>
+                        <div class="focus">Technical Delivery & Leadership</div>
+                    </div>
+                    <div class="role-card-body">
+                        <ul>
+                            <li>All Senior responsibilities plus:</li>
+                            <li>Mentors and develops engineers</li>
+                            <li>Project leadership & oversight</li>
+                            <li>Direct NSP/AEMO engagement</li>
+                            <li>Project budget management</li>
+                            <li>Client relationship ownership</li>
+                            <li>Technical review & QA sign-off</li>
+                            <li>Scope definition & proposal input</li>
+                            <li>Multi-project coordination</li>
+                            <li>Technical risk assessment</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="role-card principal">
+                    <div class="role-card-header">
+                        <h4>Principal Engineer</h4>
+                        <div class="focus">Technical Delivery & Strategic Leadership</div>
+                    </div>
+                    <div class="role-card-body">
+                        <ul>
+                            <li>All Lead responsibilities plus:</li>
+                            <li>Strategic oversight across projects</li>
+                            <li>Business development & growth</li>
+                            <li>Senior client advisory</li>
+                            <li>Team capacity & capability planning</li>
+                            <li>Guides Leads on complex decisions</li>
+                            <li>Industry thought leadership</li>
+                            <li>Proposal strategy & pricing oversight</li>
+                            <li>Market positioning & service offering</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Leadership expectation bracket -->
+        <div class="leadership-bracket">
+            <div class="bracket-visual">
+                <div class="bracket-arm left"></div>
+                <div class="bracket-stem"></div>
+                <div class="bracket-arm right"></div>
+            </div>
+            <div class="bracket-message">
+                <p>Our Leads and Principals don't just manage work - they drive it. They bring personal investment to every project, set the standard for technical excellence, and lift the people around them. We're looking for engineers who go beyond the brief because they genuinely care about the outcome - people who are strong within themselves, back their expertise, and lead by example. That's what sets our people apart.</p>
+            </div>
+        </div>
+
+        <section class="section">
+            <h3>Technical Experience We'll Discuss</h3>
+
+            <div class="topic-card">
+                <h4>Grid Connection Studies</h4>
+                <p>We'd like to hear about your experience with connection studies, including:</p>
+                <ul>
+                    <li>R1 (model-based) and R2 (commissioning) studies</li>
+                    <li>Grid code compliance demonstration</li>
+                    <li>Working with network operators (AEMO, TNSPs)</li>
+                </ul>
+            </div>
+
+            <div class="topic-card">
+                <h4>Simulation Tools</h4>
+                <p>Please be prepared to discuss your proficiency with power system simulation software:</p>
+                <ul>
+                    <li>PSCAD for EMT studies</li>
+                    <li>PSS/E or DIgSILENT for RMS/steady-state analysis</li>
+                    <li>Any scripting or automation experience (Python, etc.)</li>
+                </ul>
+            </div>
+
+            <div class="topic-card">
+                <h4>Inverter-Based Resources</h4>
+                <p>Understanding of modern renewable generation is important:</p>
+                <ul>
+                    <li>Grid-Following vs Grid-Forming inverter concepts</li>
+                    <li>System strength and SCR (Short Circuit Ratio)</li>
+                    <li>Plant Primary Controller (PPC) functionality</li>
+                </ul>
+            </div>
+
+            <div class="topic-card">
+                <h4>Project Experience</h4>
+                <p>We're interested in hearing about specific projects you've contributed to:</p>
+                <ul>
+                    <li>Project scale (MW capacity)</li>
+                    <li>Your specific role and responsibilities</li>
+                    <li>Challenges you overcame</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="section">
+            <h3>What We Value</h3>
+
+            <div class="topic-card">
+                <h4>Clear Communication</h4>
+                <p>The ability to explain complex technical concepts clearly - to clients, colleagues, and stakeholders at all levels.</p>
+            </div>
+
+            <div class="topic-card">
+                <h4>Ownership & Accountability</h4>
+                <p>Taking responsibility for your work, being transparent about challenges, and proactively solving problems.</p>
+            </div>
+
+            <div class="topic-card">
+                <h4>Continuous Learning</h4>
+                <p>Honest about skill gaps and eager to develop. The energy transition means we're all constantly learning.</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h3>A Word on Culture</h3>
+            <div class="topic-card">
+                <h4>The Intangible</h4>
+                <p>People who've worked here speak fondly of the team - not just the work, but the people. What makes Vysus warm and genuine is something hard to pin down. It occurred to me that two people who've been here the longest are a big part of it: Parthena, who brings a natural care and attention to everything she touches, and Tony, whose knowledge, leadership and willingness to share sets a tone for the whole group. They drive something intangible - a culture that's felt rather than described. That's worth knowing before you join.</p>
+            </div>
+        </section>
+
+        <div class="highlight-box">
+            <h4>Next Steps</h4>
+            <p>Your recruiter will arrange a brief screening conversation to discuss your experience in these areas. This helps us match you with the right opportunity and ensures our technical interviews are focused and productive for everyone.</p>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>Vysus Group | Grid Connection Engineer - Candidate Brief</p>
+        <p class="tagline">Ingenuity. Imagination. Insight.</p>
+    </footer>
+</body>
+</html>
