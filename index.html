@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recruiter Pre-Screening Guide | Vysus Group</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             /* Primary */
@@ -1097,23 +1098,33 @@
                 <path d="M0 0 L38.7 112.2 L85 112.2 L46.2 0 Z" fill="#00E3A9"/>
                 <path d="M86.2 2.8 L74.8 10.9 L67.6 22.6 L65.7 36.1 L68.5 48.1 L76.9 59.8 L88.2 66.6 L100 68.6 L100 0 Z" fill="#00E3A9"/>
             </svg>
-            <h2>Protected Content</h2>
-            <p>Enter password to access this document</p>
-            <input type="password" class="password-input" id="passwordInput" placeholder="Password" onkeypress="if(event.key==='Enter')checkPassword()">
-            <button class="password-btn" onclick="checkPassword()">Access Document</button>
-            <p class="password-error" id="passwordError">Incorrect password. Please try again.</p>
+            <h2 id="authTitle">Checking Authentication...</h2>
+            <p id="authSubtitle">Please wait while we verify your access.</p>
+            <div id="loginPrompt" style="display: none;">
+                <a href="/login.html" class="password-btn" style="display: inline-block; text-decoration: none; margin-top: 20px;">Sign In</a>
+            </div>
         </div>
     </div>
 
     <div class="protected-content" id="protectedContent">
     <header class="header">
         <div class="header-content">
-            <div class="logo">
-                <svg class="vysus-marque" viewBox="0 0 100 112" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M0 0 L38.7 112.2 L85 112.2 L46.2 0 Z" fill="#00E3A9"/>
-                    <path d="M86.2 2.8 L74.8 10.9 L67.6 22.6 L65.7 36.1 L68.5 48.1 L76.9 59.8 L88.2 66.6 L100 68.6 L100 0 Z" fill="#00E3A9"/>
-                </svg>
-                <span class="logo-text">VYSUS GROUP</span>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+                <div class="logo">
+                    <svg class="vysus-marque" viewBox="0 0 100 112" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M0 0 L38.7 112.2 L85 112.2 L46.2 0 Z" fill="#00E3A9"/>
+                        <path d="M86.2 2.8 L74.8 10.9 L67.6 22.6 L65.7 36.1 L68.5 48.1 L76.9 59.8 L88.2 66.6 L100 68.6 L100 0 Z" fill="#00E3A9"/>
+                    </svg>
+                    <span class="logo-text">VYSUS GROUP</span>
+                </div>
+                <div id="userInfo" style="text-align: right; color: var(--vysus-white); font-size: 13px;">
+                    <span id="userEmail" style="opacity: 0.8;"></span>
+                    <div style="margin-top: 8px;">
+                        <a href="/resume-analyzer.html" style="color: var(--vysus-stockholm-neon); text-decoration: none; margin-right: 16px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Resume Analyzer</a>
+                        <a href="/candidates.html" style="color: var(--vysus-stockholm-neon); text-decoration: none; margin-right: 16px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Candidates</a>
+                        <button onclick="handleSignOut()" style="background: transparent; border: 1px solid rgba(255,255,255,0.3); color: var(--vysus-white); padding: 6px 12px; font-size: 11px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px;">Sign Out</button>
+                    </div>
+                </div>
             </div>
             <h1>Recruiter Pre-Screening Guide</h1>
             <p class="subtitle">Grid Connection Engineer Candidates</p>
@@ -1686,28 +1697,63 @@
     </footer>
     </div>
 
+    <script src="js/supabase-client.js"></script>
     <script>
-        function checkPassword() {
-            const input = document.getElementById('passwordInput');
+        // Initialize and check authentication
+        document.addEventListener('DOMContentLoaded', async () => {
+            initSupabase();
+
             const overlay = document.getElementById('passwordOverlay');
             const content = document.getElementById('protectedContent');
-            const error = document.getElementById('passwordError');
+            const authTitle = document.getElementById('authTitle');
+            const authSubtitle = document.getElementById('authSubtitle');
+            const loginPrompt = document.getElementById('loginPrompt');
 
-            if (input.value === 'vysus2026') {
+            // Check for dev session first (localhost testing)
+            const devSession = localStorage.getItem('vysus_dev_session');
+            if (devSession) {
+                const dev = JSON.parse(devSession);
                 overlay.style.display = 'none';
                 content.classList.add('unlocked');
-                sessionStorage.setItem('authenticated', 'true');
-            } else {
-                error.style.display = 'block';
-                input.value = '';
-                input.focus();
+                document.getElementById('userEmail').textContent = dev.email + ' (DEV)';
+                console.log('Dev session active:', dev);
+                return;
             }
-        }
 
-        // Check if already authenticated in this session
-        if (sessionStorage.getItem('authenticated') === 'true') {
-            document.getElementById('passwordOverlay').style.display = 'none';
-            document.getElementById('protectedContent').classList.add('unlocked');
+            try {
+                const { session } = await getSession();
+
+                if (session) {
+                    // User is authenticated - show content
+                    overlay.style.display = 'none';
+                    content.classList.add('unlocked');
+
+                    // Log activity and update last login
+                    await updateLastLogin(session.user.id);
+                    await logActivity('view_screening_guide', { page: 'index.html' });
+
+                    // Show user email
+                    document.getElementById('userEmail').textContent = session.user.email;
+                } else {
+                    // User not authenticated - show login prompt
+                    authTitle.textContent = 'Authentication Required';
+                    authSubtitle.textContent = 'Please sign in to access this document.';
+                    loginPrompt.style.display = 'block';
+                }
+            } catch (err) {
+                console.error('Auth check error:', err);
+                authTitle.textContent = 'Authentication Required';
+                authSubtitle.textContent = 'Please sign in to access this document.';
+                loginPrompt.style.display = 'block';
+            }
+        });
+
+        // Sign out handler
+        async function handleSignOut() {
+            // Clear dev session if exists
+            localStorage.removeItem('vysus_dev_session');
+            await logActivity('sign_out', {});
+            await signOut();
         }
 
         // Add score dots to all question headers
