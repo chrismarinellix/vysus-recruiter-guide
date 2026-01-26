@@ -1003,6 +1003,339 @@
             }
         }
 
+        /* Resume Analyzer Inline */
+        .analyzer-section {
+            background: var(--vysus-white);
+            border: 2px solid var(--vysus-bergen-rain);
+            margin-bottom: 40px;
+        }
+
+        .analyzer-header {
+            background: var(--vysus-malmo-green);
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .analyzer-header h3 {
+            color: var(--vysus-white);
+            font-size: 18px;
+            font-weight: 400;
+        }
+
+        .analyzer-toggle {
+            color: var(--vysus-stockholm-neon);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .analyzer-body {
+            padding: 24px;
+            display: none;
+        }
+
+        .analyzer-body.open {
+            display: block;
+        }
+
+        .analyzer-upload {
+            border: 2px dashed var(--vysus-bergen-rain);
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .analyzer-upload.dragover {
+            border-color: var(--vysus-stockholm-neon);
+            background: rgba(0, 227, 169, 0.05);
+        }
+
+        .analyzer-upload p {
+            color: var(--vysus-scandinavia-rock);
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .analyzer-form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            gap: 16px;
+            align-items: end;
+        }
+
+        .analyzer-form-row .form-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--vysus-malmo-green);
+            margin-bottom: 6px;
+        }
+
+        .analyzer-form-row .form-group input,
+        .analyzer-form-row .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid var(--vysus-bergen-rain);
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .analyzer-form-row .form-group input:focus,
+        .analyzer-form-row .form-group select:focus {
+            outline: none;
+            border-color: var(--vysus-stockholm-neon);
+        }
+
+        .analyze-btn-inline {
+            padding: 10px 24px;
+            background: var(--vysus-stockholm-neon);
+            color: var(--vysus-malmo-green);
+            font-size: 13px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            transition: all 0.3s;
+            height: 42px;
+        }
+
+        .analyze-btn-inline:hover {
+            background: var(--vysus-malmo-green);
+            color: var(--vysus-white);
+        }
+
+        .analyze-btn-inline:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .upload-btn-sm {
+            padding: 10px 24px;
+            background: var(--vysus-stockholm-neon);
+            color: var(--vysus-malmo-green);
+            font-size: 13px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .upload-btn-sm:hover {
+            background: var(--vysus-malmo-green);
+            color: var(--vysus-white);
+        }
+
+        .file-selected {
+            margin-top: 12px;
+            font-size: 13px;
+            color: var(--vysus-malmo-green);
+            display: none;
+        }
+
+        .file-selected.visible {
+            display: block;
+        }
+
+        /* AI Summary Result */
+        .ai-result {
+            display: none;
+            margin-top: 20px;
+            padding: 24px;
+            background: var(--vysus-oslo-snow);
+            border-left: 4px solid var(--vysus-stockholm-neon);
+        }
+
+        .ai-result.visible {
+            display: block;
+        }
+
+        .ai-result h4 {
+            color: var(--vysus-malmo-green);
+            font-size: 14px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .ai-result p {
+            color: var(--vysus-scandinavia-rock);
+            font-size: 14px;
+            line-height: 1.7;
+            margin-bottom: 8px;
+        }
+
+        .ai-result .score-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            font-size: 16px;
+            font-weight: 500;
+            margin-right: 12px;
+            margin-bottom: 12px;
+        }
+
+        .ai-result .score-badge.overall {
+            background: var(--vysus-stockholm-neon);
+            color: var(--vysus-malmo-green);
+        }
+
+        .ai-result .score-badge.level {
+            background: var(--vysus-malmo-green);
+            color: var(--vysus-white);
+        }
+
+        .strengths-gaps {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .strengths-gaps ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .strengths-gaps li {
+            padding: 4px 0;
+            font-size: 13px;
+            color: var(--vysus-scandinavia-rock);
+            padding-left: 16px;
+            position: relative;
+        }
+
+        .strengths-gaps li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 10px;
+            width: 6px;
+            height: 6px;
+        }
+
+        .strengths-list li::before {
+            background: var(--vysus-stockholm-neon);
+        }
+
+        .gaps-list li::before {
+            background: #F92D63;
+        }
+
+        .strengths-gaps h5 {
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .strengths-list h5 { color: var(--vysus-malmo-green); }
+        .gaps-list h5 { color: #F92D63; }
+
+        /* Analyzing overlay inline */
+        .analyzing-indicator {
+            display: none;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .analyzing-indicator.visible {
+            display: block;
+        }
+
+        .analyzing-indicator .spinner-inline {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--vysus-bergen-rain);
+            border-top-color: var(--vysus-stockholm-neon);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 12px;
+        }
+
+        .analyzing-indicator p {
+            color: var(--vysus-scandinavia-rock);
+            font-size: 14px;
+        }
+
+        /* Skill highlighting on role cards */
+        .role-card-body li.skill-strong {
+            color: var(--vysus-malmo-green);
+            font-weight: 400;
+            background: rgba(0, 227, 169, 0.12);
+            padding: 8px 10px;
+            margin: 2px -10px;
+            animation: skillPulse 2.5s ease-in-out infinite;
+        }
+
+        .role-card-body li.skill-strong::before {
+            background: var(--vysus-stockholm-neon);
+            width: 10px;
+            height: 10px;
+            margin-top: 4px;
+            border-radius: 50%;
+            box-shadow: 0 0 8px rgba(0, 227, 169, 0.6);
+        }
+
+        .role-card-body li.skill-partial {
+            color: #856404;
+            background: rgba(255, 193, 7, 0.08);
+            padding: 8px 10px;
+            margin: 2px -10px;
+        }
+
+        .role-card-body li.skill-partial::before {
+            background: #ffc107;
+            width: 8px;
+            height: 8px;
+            margin-top: 5px;
+        }
+
+        .role-card-body li.skill-none-checked {
+            opacity: 0.5;
+        }
+
+        @keyframes skillPulse {
+            0%, 100% { background: rgba(0, 227, 169, 0.12); }
+            50% { background: rgba(0, 227, 169, 0.25); }
+        }
+
+        /* Disclaimer */
+        .disclaimer {
+            background: rgba(249, 45, 99, 0.06);
+            border-left: 4px solid rgba(249, 45, 99, 0.4);
+            padding: 16px 20px;
+            margin-bottom: 30px;
+        }
+
+        .disclaimer p {
+            color: var(--vysus-scandinavia-rock);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .disclaimer strong {
+            color: var(--vysus-malmo-green);
+        }
+
+        @media (max-width: 900px) {
+            .analyzer-form-row {
+                grid-template-columns: 1fr;
+            }
+            .strengths-gaps {
+                grid-template-columns: 1fr;
+            }
+        }
+
         /* Password Protection Overlay */
         .password-overlay {
             position: fixed;
@@ -1137,6 +1470,64 @@
             <p>These aren't pass/fail tests - they're conversation starters. Listen for <strong>confidence</strong>, <strong>clarity</strong>, and <strong>relevant experience</strong>. Red flags include vague answers, blaming others, or inability to explain concepts simply. You're helping filter candidates before technical interviews, not conducting the technical assessment yourself.</p>
         </div>
 
+        <div class="disclaimer">
+            <p><strong>Important:</strong> This tool is designed to support and expedite the screening process, enabling more comprehensive candidate evaluation and increasing successful hiring outcomes for Vysus. It does not replace the deeper, intangible assessment that comes through recruiter conversations and team interviews. Technical capability, cultural alignment, and leadership presence must be validated through direct engagement with the candidate.</p>
+        </div>
+
+        <!-- Resume Analyzer -->
+        <div class="analyzer-section">
+            <div class="analyzer-header" onclick="toggleAnalyzer()">
+                <h3>Resume Analyzer</h3>
+                <span class="analyzer-toggle" id="analyzerToggle">Upload Resume</span>
+            </div>
+            <div class="analyzer-body" id="analyzerBody">
+                <div class="analyzer-upload" id="analyzerUpload">
+                    <p>Drop a resume here, or click to select a file (PDF, DOC, DOCX, TXT)</p>
+                    <input type="file" id="resumeFileInput" accept=".pdf,.doc,.docx,.txt" style="display:none">
+                    <button class="upload-btn-sm" onclick="document.getElementById('resumeFileInput').click()">Choose File</button>
+                    <div class="file-selected" id="fileSelected"><strong>Selected:</strong> <span id="selectedFileName"></span></div>
+                </div>
+                <div class="analyzer-form-row">
+                    <div class="form-group">
+                        <label for="resumeCandidateName">Candidate Name</label>
+                        <input type="text" id="resumeCandidateName" placeholder="Auto-detected from resume">
+                    </div>
+                    <div class="form-group">
+                        <label for="resumeCandidateEmail">Candidate Email</label>
+                        <input type="email" id="resumeCandidateEmail" placeholder="Auto-detected from resume">
+                    </div>
+                    <div class="form-group">
+                        <label for="resumeTargetPosition">Target Position</label>
+                        <select id="resumeTargetPosition">
+                            <option value="Senior">Senior Engineer</option>
+                            <option value="Lead">Lead Engineer</option>
+                            <option value="Principal">Principal Engineer</option>
+                        </select>
+                    </div>
+                    <button class="analyze-btn-inline" id="analyzeResumeBtn" onclick="runAnalysis()" disabled>Analyze</button>
+                </div>
+                <div class="analyzing-indicator" id="analyzingIndicator">
+                    <div class="spinner-inline"></div>
+                    <p>Analyzing resume against role requirements...</p>
+                </div>
+                <div class="ai-result" id="aiResult">
+                    <h4>AI Analysis Summary</h4>
+                    <div id="aiScoreBadges"></div>
+                    <p id="aiSummaryText"></p>
+                    <div class="strengths-gaps">
+                        <div class="strengths-list">
+                            <h5>Key Strengths</h5>
+                            <ul id="aiStrengths"></ul>
+                        </div>
+                        <div class="gaps-list">
+                            <h5>Development Areas</h5>
+                            <ul id="aiGaps"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Fixed Bottom Scoring Bar -->
         <div class="scoring-bar" id="scoringBar">
             <div class="scoring-bar-inner">
@@ -1193,56 +1584,56 @@
                     <div class="focus">Technical Delivery</div>
                 </div>
                 <div class="role-card-body">
-                    <ul>
-                        <li class="new-skill">Independent study delivery (R1/R2)</li>
-                        <li class="new-skill">Strong in 1-2 modelling tools (PSCAD, PSS/E)</li>
-                        <li class="new-skill">EMT & RMS simulation execution</li>
-                        <li class="new-skill">Grid code compliance assessment</li>
-                        <li class="new-skill">Model validation & tuning</li>
-                        <li class="new-skill">Technical report writing</li>
-                        <li>Developing client communication</li>
-                        <li>Contributes to team knowledge</li>
+                    <ul id="senior-skills">
+                        <li class="new-skill" data-skill="senior-0">Independent study delivery (R1/R2)</li>
+                        <li class="new-skill" data-skill="senior-1">Strong in 1-2 modelling tools (PSCAD, PSS/E)</li>
+                        <li class="new-skill" data-skill="senior-2">EMT & RMS simulation execution</li>
+                        <li class="new-skill" data-skill="senior-3">Grid code compliance assessment</li>
+                        <li class="new-skill" data-skill="senior-4">Model validation & tuning</li>
+                        <li class="new-skill" data-skill="senior-5">Technical report writing</li>
+                        <li data-skill="senior-6">Developing client communication</li>
+                        <li data-skill="senior-7">Contributes to team knowledge</li>
                     </ul>
                 </div>
             </div>
 
-            <div class="role-card lead">
+            <div class="role-card lead" id="leadCard">
                 <div class="role-card-header">
                     <h3>Lead Engineer</h3>
                     <div class="focus">Technical Leadership</div>
                 </div>
                 <div class="role-card-body">
-                    <ul>
+                    <ul id="lead-skills">
                         <li>All Senior responsibilities plus:</li>
-                        <li class="new-skill">Mentors and develops engineers</li>
-                        <li class="new-skill">Project leadership & oversight</li>
-                        <li class="new-skill">Direct NSP/AEMO engagement</li>
-                        <li class="new-skill">Project budget management</li>
-                        <li class="new-skill">Client relationship ownership</li>
-                        <li class="new-skill">Technical review & QA sign-off</li>
-                        <li class="new-skill">Scope definition & proposal input</li>
-                        <li class="new-skill">Multi-project coordination</li>
-                        <li class="new-skill">Technical risk assessment</li>
+                        <li class="new-skill" data-skill="lead-0">Mentors and develops engineers</li>
+                        <li class="new-skill" data-skill="lead-1">Project leadership & oversight</li>
+                        <li class="new-skill" data-skill="lead-2">Direct NSP/AEMO engagement</li>
+                        <li class="new-skill" data-skill="lead-3">Project budget management</li>
+                        <li class="new-skill" data-skill="lead-4">Client relationship ownership</li>
+                        <li class="new-skill" data-skill="lead-5">Technical review & QA sign-off</li>
+                        <li class="new-skill" data-skill="lead-6">Scope definition & proposal input</li>
+                        <li class="new-skill" data-skill="lead-7">Multi-project coordination</li>
+                        <li class="new-skill" data-skill="lead-8">Technical risk assessment</li>
                     </ul>
                 </div>
             </div>
 
-            <div class="role-card principal">
+            <div class="role-card principal" id="principalCard">
                 <div class="role-card-header">
                     <h3>Principal Engineer</h3>
                     <div class="focus">Strategic Leadership</div>
                 </div>
                 <div class="role-card-body">
-                    <ul>
+                    <ul id="principal-skills">
                         <li>All Lead responsibilities plus:</li>
-                        <li class="new-skill">Strategic oversight across projects</li>
-                        <li class="new-skill">Business development & growth</li>
-                        <li class="new-skill">Senior client advisory</li>
-                        <li class="new-skill">Team capacity & capability planning</li>
-                        <li class="new-skill">Guides Leads on complex decisions</li>
-                        <li class="new-skill">Industry thought leadership</li>
-                        <li class="new-skill">Proposal strategy & pricing oversight</li>
-                        <li class="new-skill">Market positioning & service offering</li>
+                        <li class="new-skill" data-skill="principal-0">Strategic oversight across projects</li>
+                        <li class="new-skill" data-skill="principal-1">Business development & growth</li>
+                        <li class="new-skill" data-skill="principal-2">Senior client advisory</li>
+                        <li class="new-skill" data-skill="principal-3">Team capacity & capability planning</li>
+                        <li class="new-skill" data-skill="principal-4">Guides Leads on complex decisions</li>
+                        <li class="new-skill" data-skill="principal-5">Industry thought leadership</li>
+                        <li class="new-skill" data-skill="principal-6">Proposal strategy & pricing oversight</li>
+                        <li class="new-skill" data-skill="principal-7">Market positioning & service offering</li>
                     </ul>
                 </div>
             </div>
@@ -1698,7 +2089,190 @@
     </div>
 
     <script src="js/supabase-client.js"></script>
+    <script src="js/role-requirements.js"></script>
     <script>
+        // Resume Analyzer
+        let resumeFile = null;
+
+        function toggleAnalyzer() {
+            const body = document.getElementById('analyzerBody');
+            const toggle = document.getElementById('analyzerToggle');
+            body.classList.toggle('open');
+            toggle.textContent = body.classList.contains('open') ? 'Close' : 'Upload Resume';
+        }
+
+        // Drag and drop
+        document.addEventListener('DOMContentLoaded', () => {
+            const upload = document.getElementById('analyzerUpload');
+            if (upload) {
+                upload.addEventListener('dragover', (e) => { e.preventDefault(); upload.classList.add('dragover'); });
+                upload.addEventListener('dragleave', () => upload.classList.remove('dragover'));
+                upload.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    upload.classList.remove('dragover');
+                    if (e.dataTransfer.files.length) handleResumeFile(e.dataTransfer.files[0]);
+                });
+            }
+        });
+
+        document.addEventListener('change', (e) => {
+            if (e.target.id === 'resumeFileInput' && e.target.files.length) {
+                handleResumeFile(e.target.files[0]);
+            }
+        });
+
+        async function handleResumeFile(file) {
+            const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
+            if (!validTypes.includes(file.type)) {
+                alert('Please upload a PDF, DOC, DOCX, or TXT file.');
+                return;
+            }
+            resumeFile = file;
+            document.getElementById('selectedFileName').textContent = file.name;
+            document.getElementById('fileSelected').classList.add('visible');
+            document.getElementById('analyzeResumeBtn').disabled = false;
+
+            // Extract name and email
+            try {
+                const text = await readResumeText(file);
+                const emailMatch = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+                if (emailMatch) document.getElementById('resumeCandidateEmail').value = emailMatch[0];
+
+                const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+                if (lines.length > 0) {
+                    let nameLine = lines[0].replace(/^(mr|mrs|ms|dr|prof)\.?\s*/i, '').replace(/\s+/g, ' ').trim();
+                    if (nameLine.split(' ').length <= 4 && /^[a-zA-Z\s\-']+$/.test(nameLine)) {
+                        document.getElementById('resumeCandidateName').value = nameLine;
+                    }
+                }
+            } catch (err) { console.log('Could not extract info:', err); }
+        }
+
+        function readResumeText(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => resolve(e.target.result);
+                reader.onerror = reject;
+                if (file.type === 'application/pdf') reader.readAsDataURL(file);
+                else reader.readAsText(file);
+            });
+        }
+
+        async function runAnalysis() {
+            const name = document.getElementById('resumeCandidateName').value.trim();
+            const email = document.getElementById('resumeCandidateEmail').value.trim();
+            const position = document.getElementById('resumeTargetPosition').value;
+
+            if (!resumeFile) { alert('Please select a resume file.'); return; }
+            if (!name) { alert('Please enter the candidate name.'); return; }
+
+            // Show loading
+            document.getElementById('analyzingIndicator').classList.add('visible');
+            document.getElementById('aiResult').classList.remove('visible');
+            document.getElementById('analyzeResumeBtn').disabled = true;
+
+            // Clear previous highlights
+            clearSkillHighlights();
+
+            try {
+                const fileContent = await readResumeText(resumeFile);
+
+                const response = await fetch('/.netlify/functions/analyze-resume', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        resumeText: fileContent,
+                        candidateName: name,
+                        targetPosition: position,
+                        roleRequirements: window.roleRequirements
+                    })
+                });
+
+                if (!response.ok) throw new Error('Analysis failed');
+
+                const analysis = await response.json();
+
+                // Save to database
+                try {
+                    await saveResumeAnalysis({
+                        candidate_name: name,
+                        candidate_email: email,
+                        target_position: position,
+                        groq_analysis: analysis,
+                        overall_score: analysis.overallScore,
+                        recommendation: analysis.recommendation
+                    });
+                    await logActivity('analyze_resume', { candidate: name, position, score: analysis.overallScore });
+                } catch (dbErr) { console.log('DB save error (non-blocking):', dbErr); }
+
+                // Display results
+                displayInlineResults(analysis);
+
+                // Highlight role cards
+                highlightSkills(analysis);
+
+                // Auto-fill candidate name in scoring bar
+                const scoringName = document.getElementById('candidateName');
+                if (scoringName && !scoringName.value) scoringName.value = name;
+
+            } catch (err) {
+                console.error('Analysis error:', err);
+                alert('Error analyzing resume. Please try again.');
+            } finally {
+                document.getElementById('analyzingIndicator').classList.remove('visible');
+                document.getElementById('analyzeResumeBtn').disabled = false;
+            }
+        }
+
+        function displayInlineResults(analysis) {
+            const result = document.getElementById('aiResult');
+            document.getElementById('aiScoreBadges').innerHTML =
+                `<span class="score-badge overall">${analysis.overallScore}% Match</span>` +
+                `<span class="score-badge level">${analysis.recommendedLevel || 'N/A'}</span>`;
+
+            document.getElementById('aiSummaryText').textContent = analysis.summary || '';
+
+            document.getElementById('aiStrengths').innerHTML = (analysis.keyStrengths || [])
+                .map(s => `<li>${s}</li>`).join('') || '<li>None identified</li>';
+
+            document.getElementById('aiGaps').innerHTML = (analysis.gaps || [])
+                .map(g => `<li>${g}</li>`).join('') || '<li>None identified</li>';
+
+            result.classList.add('visible');
+        }
+
+        function highlightSkills(analysis) {
+            const roleMatches = analysis.roleMatches || {};
+            const roles = ['senior', 'lead', 'principal'];
+
+            roles.forEach(role => {
+                const data = roleMatches[role];
+                if (!data || !data.skills) return;
+
+                data.skills.forEach((match, i) => {
+                    const el = document.querySelector(`[data-skill="${role}-${i}"]`);
+                    if (!el) return;
+
+                    if (match === 'strong') {
+                        el.classList.add('skill-strong');
+                    } else if (match === 'partial') {
+                        el.classList.add('skill-partial');
+                    } else {
+                        el.classList.add('skill-none-checked');
+                    }
+                });
+            });
+
+            // Scroll to role cards to show highlights
+            document.querySelector('.role-progression').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function clearSkillHighlights() {
+            document.querySelectorAll('[data-skill]').forEach(el => {
+                el.classList.remove('skill-strong', 'skill-partial', 'skill-none-checked');
+            });
+        }
+
         // Initialize and check authentication
         document.addEventListener('DOMContentLoaded', async () => {
             initSupabase();
