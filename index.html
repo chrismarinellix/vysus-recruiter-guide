@@ -1582,17 +1582,35 @@
             <p style="margin-top: 16px; font-size: 13px; color: var(--vysus-scandinavia-rock); line-height: 1.5;">Listen for <strong>confidence</strong>, <strong>clarity</strong>, and <strong>relevant experience</strong>. Red flags include vague answers, blaming others, or inability to explain concepts simply.</p>
         </div>
 
-        <!-- Admin Panel - visible only to admin users -->
+        <!-- My Screenings - visible to all logged-in users (own data only) -->
+        <div class="admin-panel" id="userPanel">
+            <div class="admin-panel-header" onclick="toggleUserPanel()">
+                <h3>My Screenings</h3>
+                <span id="userToggle">View</span>
+            </div>
+            <div class="admin-panel-body" id="userBody">
+                <div class="admin-tabs">
+                    <button class="admin-tab active" onclick="showUserTab('myScreenings', this)">My Screening Results</button>
+                    <button class="admin-tab" onclick="showUserTab('myAnalyses', this)">My Resume Analyses</button>
+                </div>
+                <div id="userContent">
+                    <p style="color: rgba(255,255,255,0.5); font-size: 13px;">Loading...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Dashboard - visible only to admin (chris.marinelli@vysusgroup.com) -->
         <div class="admin-panel" id="adminPanel">
-            <div class="admin-panel-header" onclick="toggleAdminPanel()">
+            <div class="admin-panel-header" onclick="toggleAdminPanel()" style="background: var(--vysus-trondheim-night); border-bottom: 2px solid var(--vysus-stockholm-neon);">
                 <h3>Admin Dashboard</h3>
-                <span id="adminToggle">View Activity</span>
+                <span id="adminToggle">View All Activity</span>
             </div>
             <div class="admin-panel-body" id="adminBody">
                 <div class="admin-tabs">
-                    <button class="admin-tab active" onclick="showAdminTab('activity', this)">Activity Log</button>
-                    <button class="admin-tab" onclick="showAdminTab('screenings', this)">Screening Results</button>
-                    <button class="admin-tab" onclick="showAdminTab('analyses', this)">Resume Analyses</button>
+                    <button class="admin-tab active" onclick="showAdminTab('activity', this)">All Activity</button>
+                    <button class="admin-tab" onclick="showAdminTab('logins', this)">User Logins</button>
+                    <button class="admin-tab" onclick="showAdminTab('screenings', this)">All Screenings</button>
+                    <button class="admin-tab" onclick="showAdminTab('analyses', this)">All Analyses</button>
                 </div>
                 <div id="adminContent">
                     <p style="color: rgba(255,255,255,0.5); font-size: 13px;">Loading...</p>
@@ -2432,7 +2450,7 @@
                 overlay.style.display = 'none';
                 content.classList.add('unlocked');
                 document.getElementById('userEmail').textContent = dev.email + ' (DEV)';
-                // Show admin panel in dev mode
+                document.getElementById('userPanel').classList.add('visible');
                 document.getElementById('adminPanel').classList.add('visible');
                 console.log('Dev session active:', dev);
                 return;
@@ -2453,7 +2471,10 @@
                     // Show user email
                     document.getElementById('userEmail').textContent = session.user.email;
 
-                    // Show admin panel for admin users
+                    // Show user panel for all authenticated users
+                    document.getElementById('userPanel').classList.add('visible');
+
+                    // Show admin panel for admin users only
                     const adminEmails = ['chris.marinelli@vysusgroup.com', 'jasmine@designandbuild.com.au'];
                     if (adminEmails.includes(session.user.email)) {
                         document.getElementById('adminPanel').classList.add('visible');
@@ -2778,21 +2799,82 @@
             window.location.href = `mailto:?subject=${subject}&body=${body}`;
         }
 
-        // Admin panel functions
+        // ===== USER PANEL (own data only - RLS enforced) =====
+        function toggleUserPanel() {
+            const body = document.getElementById('userBody');
+            const toggle = document.getElementById('userToggle');
+            body.classList.toggle('open');
+            toggle.textContent = body.classList.contains('open') ? 'Close' : 'View';
+            if (body.classList.contains('open')) loadMyScreenings();
+        }
+
+        function showUserTab(tab, btn) {
+            document.querySelectorAll('#userPanel .admin-tab').forEach(t => t.classList.remove('active'));
+            btn.classList.add('active');
+            if (tab === 'myScreenings') loadMyScreenings();
+            else if (tab === 'myAnalyses') loadMyAnalyses();
+        }
+
+        async function loadMyScreenings() {
+            const content = document.getElementById('userContent');
+            content.innerHTML = '<p style="color: rgba(255,255,255,0.5); font-size: 13px;">Loading...</p>';
+            try {
+                // RLS ensures only own results returned
+                const { data, error } = await sb.from('screening_results').select('*').order('created_at', { ascending: false }).limit(20);
+                if (error) throw error;
+                if (!data || data.length === 0) {
+                    content.innerHTML = '<p style="color: rgba(255,255,255,0.5); font-size: 13px;">No screening results yet. Score a candidate to see results here.</p>';
+                    return;
+                }
+                let html = '<table class="admin-table"><thead><tr><th>Date</th><th>Candidate</th><th>Score</th><th>Result</th><th>Level</th></tr></thead><tbody>';
+                data.forEach(row => {
+                    const time = new Date(row.created_at).toLocaleString('en-AU', { day: '2-digit', month: 'short', year: 'numeric' });
+                    html += `<tr><td>${time}</td><td>${row.candidate_name}</td><td>${row.total_score}/${row.max_score} (${row.percentage}%)</td><td>${row.pass_fail || '-'}</td><td>${row.recommended_level || '-'}</td></tr>`;
+                });
+                html += '</tbody></table>';
+                content.innerHTML = html;
+            } catch (err) {
+                content.innerHTML = '<p style="color: #F92D63; font-size: 13px;">Error loading results.</p>';
+            }
+        }
+
+        async function loadMyAnalyses() {
+            const content = document.getElementById('userContent');
+            content.innerHTML = '<p style="color: rgba(255,255,255,0.5); font-size: 13px;">Loading...</p>';
+            try {
+                // RLS ensures only own analyses returned
+                const { data, error } = await getResumeAnalyses(20);
+                if (error) throw error;
+                if (!data || data.length === 0) {
+                    content.innerHTML = '<p style="color: rgba(255,255,255,0.5); font-size: 13px;">No resume analyses yet. Upload a resume to see results here.</p>';
+                    return;
+                }
+                let html = '<table class="admin-table"><thead><tr><th>Date</th><th>Candidate</th><th>Position</th><th>Score</th><th>Recommendation</th></tr></thead><tbody>';
+                data.forEach(row => {
+                    const time = new Date(row.created_at).toLocaleString('en-AU', { day: '2-digit', month: 'short', year: 'numeric' });
+                    html += `<tr><td>${time}</td><td>${row.candidate_name}</td><td>${row.target_position || '-'}</td><td>${row.overall_score || '-'}%</td><td>${row.recommendation || '-'}</td></tr>`;
+                });
+                html += '</tbody></table>';
+                content.innerHTML = html;
+            } catch (err) {
+                content.innerHTML = '<p style="color: #F92D63; font-size: 13px;">Error loading analyses.</p>';
+            }
+        }
+
+        // ===== ADMIN PANEL (all data - admin RLS policies) =====
         function toggleAdminPanel() {
             const body = document.getElementById('adminBody');
             const toggle = document.getElementById('adminToggle');
             body.classList.toggle('open');
-            toggle.textContent = body.classList.contains('open') ? 'Close' : 'View Activity';
-            if (body.classList.contains('open')) {
-                loadAdminActivity();
-            }
+            toggle.textContent = body.classList.contains('open') ? 'Close' : 'View All Activity';
+            if (body.classList.contains('open')) loadAdminActivity();
         }
 
         function showAdminTab(tab, btn) {
-            document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('#adminPanel .admin-tab').forEach(t => t.classList.remove('active'));
             btn.classList.add('active');
             if (tab === 'activity') loadAdminActivity();
+            else if (tab === 'logins') loadAdminLogins();
             else if (tab === 'screenings') loadAdminScreenings();
             else if (tab === 'analyses') loadAdminAnalyses();
         }
@@ -2818,6 +2900,31 @@
             } catch (err) {
                 content.innerHTML = '<p style="color: #F92D63; font-size: 13px;">Error loading activity log.</p>';
                 console.error('Admin activity error:', err);
+            }
+        }
+
+        async function loadAdminLogins() {
+            const content = document.getElementById('adminContent');
+            content.innerHTML = '<p style="color: rgba(255,255,255,0.5); font-size: 13px;">Loading...</p>';
+            try {
+                const { data, error } = await sb.from('recruiter_profiles').select('*').order('last_login', { ascending: false });
+                if (error) throw error;
+                if (!data || data.length === 0) {
+                    content.innerHTML = '<p style="color: rgba(255,255,255,0.5); font-size: 13px;">No users found.</p>';
+                    return;
+                }
+                let html = '<table class="admin-table"><thead><tr><th>Email</th><th>Name</th><th>Role</th><th>Last Login</th><th>Registered</th></tr></thead><tbody>';
+                data.forEach(row => {
+                    const lastLogin = row.last_login ? new Date(row.last_login).toLocaleString('en-AU', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Never';
+                    const registered = new Date(row.created_at).toLocaleString('en-AU', { day: '2-digit', month: 'short', year: 'numeric' });
+                    const roleStyle = row.role === 'admin' ? 'color: var(--vysus-stockholm-neon); font-weight: 500;' : '';
+                    html += `<tr><td>${row.email}</td><td>${row.full_name || '-'}</td><td style="${roleStyle}">${row.role}</td><td>${lastLogin}</td><td>${registered}</td></tr>`;
+                });
+                html += '</tbody></table>';
+                content.innerHTML = html;
+            } catch (err) {
+                content.innerHTML = '<p style="color: #F92D63; font-size: 13px;">Error loading users. Admin access required.</p>';
+                console.error('Admin logins error:', err);
             }
         }
 
@@ -2855,10 +2962,10 @@
                     content.innerHTML = '<p style="color: rgba(255,255,255,0.5); font-size: 13px;">No resume analyses yet.</p>';
                     return;
                 }
-                let html = '<table class="admin-table"><thead><tr><th>Date</th><th>Candidate</th><th>Email</th><th>Position</th><th>Score</th><th>Recommendation</th></tr></thead><tbody>';
+                let html = '<table class="admin-table"><thead><tr><th>Date</th><th>Uploaded By</th><th>Candidate</th><th>Email</th><th>Position</th><th>Score</th><th>Recommendation</th></tr></thead><tbody>';
                 data.forEach(row => {
                     const time = new Date(row.created_at).toLocaleString('en-AU', { day: '2-digit', month: 'short', year: 'numeric' });
-                    html += `<tr><td>${time}</td><td>${row.candidate_name}</td><td>${row.candidate_email || '-'}</td><td>${row.target_position || '-'}</td><td>${row.overall_score || '-'}%</td><td>${row.recommendation || '-'}</td></tr>`;
+                    html += `<tr><td>${time}</td><td>${row.uploaded_by || '-'}</td><td>${row.candidate_name}</td><td>${row.candidate_email || '-'}</td><td>${row.target_position || '-'}</td><td>${row.overall_score || '-'}%</td><td>${row.recommendation || '-'}</td></tr>`;
                 });
                 html += '</tbody></table>';
                 content.innerHTML = html;
