@@ -8,7 +8,24 @@ let sb;
 
 function initSupabase() {
   if (typeof window !== 'undefined' && window.supabase) {
-    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true
+      }
+    });
+
+    // Listen for auth changes (handles magic link callback + token refresh)
+    sb.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        console.log('Session established for:', session.user.email);
+      }
+      if (event === 'TOKEN_REFRESHED') {
+        console.log('Session token refreshed');
+      }
+    });
+
     return sb;
   }
   console.error('Supabase SDK not loaded');
