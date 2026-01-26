@@ -951,6 +951,102 @@
             font-weight: 400;
         }
 
+        /* Admin Panel */
+        .admin-panel {
+            display: none;
+            background: var(--vysus-trondheim-night);
+            border: 2px solid var(--vysus-stockholm-neon);
+            margin-bottom: 40px;
+        }
+
+        .admin-panel.visible {
+            display: block;
+        }
+
+        .admin-panel-header {
+            background: var(--vysus-malmo-green);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .admin-panel-header h3 {
+            color: var(--vysus-stockholm-neon);
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+        .admin-panel-header span {
+            color: var(--vysus-stockholm-neon);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .admin-panel-body {
+            padding: 20px 24px;
+            display: none;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .admin-panel-body.open {
+            display: block;
+        }
+
+        .admin-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .admin-tab {
+            padding: 8px 16px;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.6);
+            font-size: 12px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-family: inherit;
+        }
+
+        .admin-tab.active {
+            background: var(--vysus-stockholm-neon);
+            color: var(--vysus-malmo-green);
+            border-color: var(--vysus-stockholm-neon);
+        }
+
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .admin-table th {
+            text-align: left;
+            padding: 10px 12px;
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--vysus-stockholm-neon);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .admin-table td {
+            padding: 8px 12px;
+            font-size: 13px;
+            color: rgba(255,255,255,0.8);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .admin-table tr:hover td {
+            background: rgba(0, 227, 169, 0.05);
+        }
+
         /* Footer */
         .footer {
             background: var(--vysus-trondheim-night);
@@ -1453,7 +1549,6 @@
                 <div id="userInfo" style="text-align: right; color: var(--vysus-white); font-size: 13px;">
                     <span id="userEmail" style="opacity: 0.8;"></span>
                     <div style="margin-top: 8px;">
-                        <a href="/resume-analyzer.html" style="color: var(--vysus-stockholm-neon); text-decoration: none; margin-right: 16px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Resume Analyzer</a>
                         <a href="/candidates.html" style="color: var(--vysus-stockholm-neon); text-decoration: none; margin-right: 16px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Candidates</a>
                         <button onclick="handleSignOut()" style="background: transparent; border: 1px solid rgba(255,255,255,0.3); color: var(--vysus-white); padding: 6px 12px; font-size: 11px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px;">Sign Out</button>
                     </div>
@@ -1467,11 +1562,53 @@
     <main class="main">
         <div class="intro">
             <h2>How to Use This Guide</h2>
-            <p>These aren't pass/fail tests - they're conversation starters. Listen for <strong>confidence</strong>, <strong>clarity</strong>, and <strong>relevant experience</strong>. Red flags include vague answers, blaming others, or inability to explain concepts simply. You're helping filter candidates before technical interviews, not conducting the technical assessment yourself.</p>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 16px;">
+                <div style="padding: 16px; background: var(--vysus-white); border-top: 3px solid var(--vysus-stockholm-neon);">
+                    <div style="font-size: 28px; font-weight: 300; color: var(--vysus-stockholm-neon); margin-bottom: 8px;">1</div>
+                    <div style="font-size: 14px; font-weight: 500; color: var(--vysus-malmo-green); margin-bottom: 6px;">Upload Resume</div>
+                    <p style="font-size: 13px; color: var(--vysus-scandinavia-rock); line-height: 1.5;">Upload the candidate's CV (PDF, DOC, or TXT). The tool will auto-detect their name and email.</p>
+                </div>
+                <div style="padding: 16px; background: var(--vysus-white); border-top: 3px solid var(--vysus-stockholm-neon);">
+                    <div style="font-size: 28px; font-weight: 300; color: var(--vysus-stockholm-neon); margin-bottom: 8px;">2</div>
+                    <div style="font-size: 14px; font-weight: 500; color: var(--vysus-malmo-green); margin-bottom: 6px;">AI Summary Generated</div>
+                    <p style="font-size: 13px; color: var(--vysus-scandinavia-rock); line-height: 1.5;">An AI-powered analysis scores the resume against Senior, Lead, and Principal Engineer role profiles, highlighting strengths and gaps.</p>
+                </div>
+                <div style="padding: 16px; background: var(--vysus-white); border-top: 3px solid var(--vysus-stockholm-neon);">
+                    <div style="font-size: 28px; font-weight: 300; color: var(--vysus-stockholm-neon); margin-bottom: 8px;">3</div>
+                    <div style="font-size: 14px; font-weight: 500; color: var(--vysus-malmo-green); margin-bottom: 6px;">Ask Screening Questions</div>
+                    <p style="font-size: 13px; color: var(--vysus-scandinavia-rock); line-height: 1.5;">Use the 9 questions below during your call. Score each answer - results auto-save and can be emailed to the team.</p>
+                </div>
+            </div>
+            <p style="margin-top: 16px; font-size: 13px; color: var(--vysus-scandinavia-rock); line-height: 1.5;">Listen for <strong>confidence</strong>, <strong>clarity</strong>, and <strong>relevant experience</strong>. Red flags include vague answers, blaming others, or inability to explain concepts simply.</p>
+        </div>
+
+        <!-- Admin Panel - visible only to admin users -->
+        <div class="admin-panel" id="adminPanel">
+            <div class="admin-panel-header" onclick="toggleAdminPanel()">
+                <h3>Admin Dashboard</h3>
+                <span id="adminToggle">View Activity</span>
+            </div>
+            <div class="admin-panel-body" id="adminBody">
+                <div class="admin-tabs">
+                    <button class="admin-tab active" onclick="showAdminTab('activity', this)">Activity Log</button>
+                    <button class="admin-tab" onclick="showAdminTab('screenings', this)">Screening Results</button>
+                    <button class="admin-tab" onclick="showAdminTab('analyses', this)">Resume Analyses</button>
+                </div>
+                <div id="adminContent">
+                    <p style="color: rgba(255,255,255,0.5); font-size: 13px;">Loading...</p>
+                </div>
+            </div>
         </div>
 
         <div class="disclaimer">
             <p><strong>Important:</strong> This tool is designed to support and expedite the screening process, enabling more comprehensive candidate evaluation and increasing successful hiring outcomes for Vysus. It does not replace the deeper, intangible assessment that comes through recruiter conversations and team interviews. Technical capability, cultural alignment, and leadership presence must be validated through direct engagement with the candidate.</p>
+        </div>
+
+        <div style="background: rgba(0, 227, 169, 0.08); border-left: 4px solid var(--vysus-stockholm-neon); padding: 16px 20px; margin-bottom: 30px;">
+            <p style="font-size: 13px; color: var(--vysus-scandinavia-rock); line-height: 1.6; margin: 0;">
+                <strong style="color: var(--vysus-malmo-green);">Data Security:</strong>
+                This tool uses <strong>Supabase with Row Level Security (RLS)</strong>. All screening data, resume analyses, and candidate assessments are stored securely and are only accessible to your authenticated account. Your data is not shared with other users. Authentication is handled via passwordless magic link email verification. API keys are stored server-side only.
+            </p>
         </div>
 
         <!-- Resume Analyzer -->
@@ -1506,6 +1643,7 @@
                     </div>
                     <button class="analyze-btn-inline" id="analyzeResumeBtn" onclick="runAnalysis()" disabled>Analyze</button>
                 </div>
+                <div id="interviewCheckResult" style="display: none; padding: 12px 16px; margin-top: 12px; font-size: 13px; line-height: 1.5;"></div>
                 <div class="analyzing-indicator" id="analyzingIndicator">
                     <div class="spinner-inline"></div>
                     <p>Analyzing resume against role requirements...</p>
@@ -1552,7 +1690,7 @@
                     <div class="pass-fail-indicator pending" id="passFail">Scoring...</div>
                 </div>
                 <div class="bar-actions">
-                    <button class="bar-btn save" onclick="saveResults()">Save</button>
+                    <span id="autoSaveStatus" style="font-size: 11px; color: var(--vysus-scandinavia-rock); padding: 10px 8px;"></span>
                     <button class="bar-btn email" onclick="emailResults()">Email</button>
                 </div>
                 <div class="summary-panel" id="summaryPanel">
@@ -2085,6 +2223,7 @@
     <footer class="footer">
         <p>Recruiter Pre-Screening Guide | Grid Connection Engineer Candidates</p>
         <p class="tagline">Ingenuity. Imagination. Insight.</p>
+        <p style="margin-top: 16px; font-size: 11px; opacity: 0.5;">Tool developed by CM</p>
     </footer>
     </div>
 
@@ -2215,6 +2354,9 @@
                 const scoringName = document.getElementById('candidateName');
                 if (scoringName && !scoringName.value) scoringName.value = name;
 
+                // Check if candidate was previously interviewed
+                await checkInterviewHistory(name);
+
             } catch (err) {
                 console.error('Analysis error:', err);
                 alert('Error analyzing resume. Please try again.');
@@ -2290,6 +2432,8 @@
                 overlay.style.display = 'none';
                 content.classList.add('unlocked');
                 document.getElementById('userEmail').textContent = dev.email + ' (DEV)';
+                // Show admin panel in dev mode
+                document.getElementById('adminPanel').classList.add('visible');
                 console.log('Dev session active:', dev);
                 return;
             }
@@ -2308,6 +2452,12 @@
 
                     // Show user email
                     document.getElementById('userEmail').textContent = session.user.email;
+
+                    // Show admin panel for admin users
+                    const adminEmails = ['chris.marinelli@vysusgroup.com', 'jasmine@designandbuild.com.au'];
+                    if (adminEmails.includes(session.user.email)) {
+                        document.getElementById('adminPanel').classList.add('visible');
+                    }
                 } else {
                     // User not authenticated - show login prompt
                     authTitle.textContent = 'Authentication Required';
@@ -2505,6 +2655,68 @@
             recCaution.textContent = caution;
 
             panel.classList.add('visible');
+
+            // Auto-save to database
+            autoSaveScreening();
+        }
+
+        let autoSaveTimeout = null;
+        function autoSaveScreening() {
+            // Debounce to avoid rapid saves when clicking quickly
+            if (autoSaveTimeout) clearTimeout(autoSaveTimeout);
+            autoSaveTimeout = setTimeout(async () => {
+                const statusEl = document.getElementById('autoSaveStatus');
+                statusEl.textContent = 'Saving...';
+                try {
+                    const name = document.getElementById('candidateName').value || 'Unnamed Candidate';
+                    const scoreCards = document.querySelectorAll('.question-score');
+                    const questionScores = [];
+                    const questions = ['Q1: Project complexity', 'Q2: Software tools', 'Q3: Team management', 'Q4: Client disagreement', 'Q5: Error handling', 'Q6: GFL vs GFM', 'Q7: SCR', 'Q8: R1 studies', 'Q9: PPC'];
+                    scoreCards.forEach((card, i) => {
+                        const sel = card.querySelector('.score-btn.selected');
+                        questionScores.push({ question: questions[i], score: sel ? parseInt(sel.dataset.value) : null, rating: sel ? sel.textContent : 'Not scored' });
+                    });
+
+                    const strengthItems = Array.from(document.querySelectorAll('#strengthsList li')).map(li => li.textContent);
+                    const concernItems = Array.from(document.querySelectorAll('#concernsList li')).map(li => li.textContent);
+                    const confScore = parseInt(document.getElementById('confidenceTotal').textContent) || 0;
+                    const leadScore = parseInt(document.getElementById('leadershipTotal').textContent) || 0;
+                    const techScore = parseInt(document.getElementById('technicalTotal').textContent) || 0;
+                    const totalScore = parseInt(document.getElementById('grandTotal').textContent) || 0;
+                    const percentage = Math.round((totalScore / 45) * 100);
+                    const passFail = document.getElementById('passFail').textContent;
+                    const recLevelText = document.getElementById('recLevel').textContent;
+                    const recReasoningText = document.getElementById('recReasoning').textContent;
+                    const recCautionText = document.getElementById('recCaution').textContent;
+
+                    const interviewCheck = await checkInterviewedCandidate(name);
+                    const wasInterviewed = interviewCheck.matches && interviewCheck.matches.length > 0;
+
+                    await saveScreeningResult({
+                        candidate_name: name,
+                        confidence_score: confScore,
+                        leadership_score: leadScore,
+                        technical_score: techScore,
+                        total_score: totalScore,
+                        percentage: percentage,
+                        pass_fail: passFail,
+                        question_scores: questionScores,
+                        strengths: strengthItems,
+                        concerns: concernItems,
+                        recommended_level: recLevelText !== '-' ? recLevelText : null,
+                        reasoning: recReasoningText || null,
+                        caution: recCautionText || null,
+                        previously_interviewed: wasInterviewed,
+                        interview_history: wasInterviewed ? interviewCheck.matches : null
+                    });
+                    await logActivity('auto_save_screening', { candidate: name, result: passFail, level: recLevelText });
+                    statusEl.textContent = 'Saved';
+                    setTimeout(() => { statusEl.textContent = ''; }, 3000);
+                } catch (err) {
+                    console.log('Auto-save error:', err);
+                    statusEl.textContent = '';
+                }
+            }, 2000);
         }
 
         function getResultsText() {
@@ -2558,25 +2770,141 @@
                 `\n---\nVysus Group | Grid Connection Engineer Screening`;
         }
 
-        function saveResults() {
-            const name = document.getElementById('candidateName').value || 'Unnamed_Candidate';
-            const date = new Date().toLocaleDateString().replace(/\//g, '-');
-            const results = getResultsText();
-
-            const blob = new Blob([results], {type: 'text/plain'});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `screening_${name.replace(/\s+/g, '_')}_${date}.txt`;
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-
         function emailResults() {
             const name = document.getElementById('candidateName').value || 'Candidate';
+            const results = getResultsText();
             const subject = encodeURIComponent(`Screening Result: ${name} - Grid Connection Engineer`);
-            const body = encodeURIComponent(getResultsText());
+            const body = encodeURIComponent(results);
             window.location.href = `mailto:?subject=${subject}&body=${body}`;
+        }
+
+        // Admin panel functions
+        function toggleAdminPanel() {
+            const body = document.getElementById('adminBody');
+            const toggle = document.getElementById('adminToggle');
+            body.classList.toggle('open');
+            toggle.textContent = body.classList.contains('open') ? 'Close' : 'View Activity';
+            if (body.classList.contains('open')) {
+                loadAdminActivity();
+            }
+        }
+
+        function showAdminTab(tab, btn) {
+            document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+            btn.classList.add('active');
+            if (tab === 'activity') loadAdminActivity();
+            else if (tab === 'screenings') loadAdminScreenings();
+            else if (tab === 'analyses') loadAdminAnalyses();
+        }
+
+        async function loadAdminActivity() {
+            const content = document.getElementById('adminContent');
+            content.innerHTML = '<p style="color: rgba(255,255,255,0.5); font-size: 13px;">Loading...</p>';
+            try {
+                const { data, error } = await getActivityLog(100);
+                if (error) throw error;
+                if (!data || data.length === 0) {
+                    content.innerHTML = '<p style="color: rgba(255,255,255,0.5); font-size: 13px;">No activity recorded yet.</p>';
+                    return;
+                }
+                let html = '<table class="admin-table"><thead><tr><th>Time</th><th>User</th><th>Action</th><th>Details</th></tr></thead><tbody>';
+                data.forEach(row => {
+                    const time = new Date(row.created_at).toLocaleString('en-AU', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+                    const details = row.details ? Object.entries(row.details).map(([k,v]) => `${k}: ${v}`).join(', ') : '';
+                    html += `<tr><td>${time}</td><td>${row.user_email || '-'}</td><td>${row.action}</td><td style="font-size: 12px; opacity: 0.7;">${details}</td></tr>`;
+                });
+                html += '</tbody></table>';
+                content.innerHTML = html;
+            } catch (err) {
+                content.innerHTML = '<p style="color: #F92D63; font-size: 13px;">Error loading activity log.</p>';
+                console.error('Admin activity error:', err);
+            }
+        }
+
+        async function loadAdminScreenings() {
+            const content = document.getElementById('adminContent');
+            content.innerHTML = '<p style="color: rgba(255,255,255,0.5); font-size: 13px;">Loading...</p>';
+            try {
+                const { data, error } = await sb.from('screening_results').select('*').order('created_at', { ascending: false }).limit(50);
+                if (error) throw error;
+                if (!data || data.length === 0) {
+                    content.innerHTML = '<p style="color: rgba(255,255,255,0.5); font-size: 13px;">No screening results yet.</p>';
+                    return;
+                }
+                let html = '<table class="admin-table"><thead><tr><th>Date</th><th>Screened By</th><th>Candidate</th><th>Score</th><th>Result</th><th>Level</th><th>Prev. Interviewed</th></tr></thead><tbody>';
+                data.forEach(row => {
+                    const time = new Date(row.created_at).toLocaleString('en-AU', { day: '2-digit', month: 'short', year: 'numeric' });
+                    const prevInt = row.previously_interviewed ? '<span style="color: #F92D63;">Yes</span>' : '<span style="color: var(--vysus-stockholm-neon);">No</span>';
+                    html += `<tr><td>${time}</td><td>${row.screened_by_email || '-'}</td><td>${row.candidate_name}</td><td>${row.total_score}/${row.max_score} (${row.percentage}%)</td><td>${row.pass_fail || '-'}</td><td>${row.recommended_level || '-'}</td><td>${prevInt}</td></tr>`;
+                });
+                html += '</tbody></table>';
+                content.innerHTML = html;
+            } catch (err) {
+                content.innerHTML = '<p style="color: #F92D63; font-size: 13px;">Error loading screening results.</p>';
+                console.error('Admin screenings error:', err);
+            }
+        }
+
+        async function loadAdminAnalyses() {
+            const content = document.getElementById('adminContent');
+            content.innerHTML = '<p style="color: rgba(255,255,255,0.5); font-size: 13px;">Loading...</p>';
+            try {
+                const { data, error } = await getResumeAnalyses(50);
+                if (error) throw error;
+                if (!data || data.length === 0) {
+                    content.innerHTML = '<p style="color: rgba(255,255,255,0.5); font-size: 13px;">No resume analyses yet.</p>';
+                    return;
+                }
+                let html = '<table class="admin-table"><thead><tr><th>Date</th><th>Candidate</th><th>Email</th><th>Position</th><th>Score</th><th>Recommendation</th></tr></thead><tbody>';
+                data.forEach(row => {
+                    const time = new Date(row.created_at).toLocaleString('en-AU', { day: '2-digit', month: 'short', year: 'numeric' });
+                    html += `<tr><td>${time}</td><td>${row.candidate_name}</td><td>${row.candidate_email || '-'}</td><td>${row.target_position || '-'}</td><td>${row.overall_score || '-'}%</td><td>${row.recommendation || '-'}</td></tr>`;
+                });
+                html += '</tbody></table>';
+                content.innerHTML = html;
+            } catch (err) {
+                content.innerHTML = '<p style="color: #F92D63; font-size: 13px;">Error loading analyses.</p>';
+                console.error('Admin analyses error:', err);
+            }
+        }
+
+        // Check if candidate was previously interviewed
+        async function checkInterviewHistory(candidateName) {
+            const resultDiv = document.getElementById('interviewCheckResult');
+            if (!candidateName || candidateName.trim().length < 2) {
+                resultDiv.style.display = 'none';
+                return;
+            }
+
+            try {
+                const { matches, error } = await checkInterviewedCandidate(candidateName);
+                if (error) { console.log('Interview check error:', error); return; }
+
+                if (matches.length === 0) {
+                    resultDiv.style.display = 'block';
+                    resultDiv.style.background = 'rgba(0, 227, 169, 0.1)';
+                    resultDiv.style.borderLeft = '4px solid var(--vysus-stockholm-neon)';
+                    resultDiv.innerHTML = '<span style="color: var(--vysus-malmo-green); font-weight: 500;">&#10003; New candidate</span> &mdash; not found in previously interviewed candidates list.';
+                } else {
+                    const match = matches[0];
+                    const dateStr = match.last_contacted ? new Date(match.last_contacted).toLocaleDateString('en-AU', { year: 'numeric', month: 'short', day: 'numeric' }) : 'Unknown date';
+                    resultDiv.style.display = 'block';
+                    resultDiv.style.background = 'rgba(249, 45, 99, 0.08)';
+                    resultDiv.style.borderLeft = '4px solid #F92D63';
+                    let html = '<span style="color: #F92D63; font-weight: 500;">&#10007; Previously interviewed</span>';
+                    html += ` &mdash; <strong>${match.name}</strong> was last contacted <strong>${dateStr}</strong>`;
+                    if (match.status) html += ` (Status: ${match.status})`;
+                    if (match.level) html += ` | Level: ${match.level}`;
+                    if (match.location) html += ` | Location: ${match.location}`;
+                    html += '<br><span style="color: #F92D63; font-style: italic; font-size: 12px;">Check with Vysus before proceeding.</span>';
+                    if (matches.length > 1) {
+                        html += `<br><span style="font-size: 12px; color: var(--vysus-scandinavia-rock);">${matches.length - 1} additional match(es) found.</span>`;
+                    }
+                    resultDiv.innerHTML = html;
+                }
+            } catch (err) {
+                console.log('Interview check failed:', err);
+            }
         }
     </script>
 </body>

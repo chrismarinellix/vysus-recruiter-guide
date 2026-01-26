@@ -187,6 +187,34 @@ async function getActivityLog(limit = 50) {
   return { data, error };
 }
 
+// Screening results functions
+async function saveScreeningResult(result) {
+  const { user } = await getUser();
+  const { data, error } = await sb
+    .from('screening_results')
+    .insert({
+      ...result,
+      screened_by: user?.id,
+      screened_by_email: user?.email || 'anonymous'
+    })
+    .select()
+    .single();
+  return { data, error };
+}
+
+// Check if candidate was previously interviewed
+async function checkInterviewedCandidate(candidateName) {
+  if (!candidateName || candidateName.trim().length < 2) return { matches: [], error: null };
+  const name = candidateName.trim();
+  // Search by partial name match
+  const { data, error } = await sb
+    .from('interviewed_candidates')
+    .select('*')
+    .ilike('name', `%${name}%`)
+    .order('last_contacted', { ascending: false });
+  return { matches: data || [], error };
+}
+
 // File upload functions
 async function uploadResume(file, candidateName) {
   const timestamp = Date.now();
@@ -246,4 +274,6 @@ if (typeof window !== 'undefined') {
   window.getResumeUrl = getResumeUrl;
   window.isAdmin = isAdmin;
   window.getAllUsers = getAllUsers;
+  window.saveScreeningResult = saveScreeningResult;
+  window.checkInterviewedCandidate = checkInterviewedCandidate;
 }

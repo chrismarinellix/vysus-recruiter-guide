@@ -175,7 +175,13 @@ Analyze the resume and return a JSON object with this exact structure:
   "gaps": ["<gap 1>", "<gap 2>", ...]
 }
 
-Be honest and accurate. If the resume doesn't clearly demonstrate a skill, mark it as "none" or "partial".
+CRITICAL RULES:
+- ONLY base your analysis on information explicitly stated in the resume text above.
+- Do NOT infer, assume, or fabricate skills, experience, or qualifications not clearly mentioned in the resume.
+- If a skill or keyword is not found in the resume, mark it as "none".
+- Only mark a skill as "partial" if there is indirect evidence in the resume (e.g., related but not exact experience).
+- Only mark a skill as "strong" if the resume explicitly demonstrates that capability.
+- Be honest and accurate. When in doubt, mark as "none" rather than guessing.
 `;
 }
 
