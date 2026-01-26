@@ -74,7 +74,11 @@ exports.handler = async (event, context) => {
     if (!groqResponse.ok) {
       const errorText = await groqResponse.text();
       console.error('Groq API error:', errorText);
-      throw new Error(`Groq API error: ${groqResponse.status}`);
+      return {
+        statusCode: 502,
+        headers,
+        body: JSON.stringify({ error: `Groq API error: ${groqResponse.status}`, details: errorText })
+      };
     }
 
     const groqData = await groqResponse.json();
