@@ -153,6 +153,8 @@ KEY TECHNICAL KEYWORDS TO LOOK FOR:
 
 Analyze the resume and return a JSON object with this exact structure:
 {
+  "extractedName": "<full name of the candidate as it appears on the resume>",
+  "extractedEmail": "<email address found on the resume, or null if not found>",
   "overallScore": <number 0-100>,
   "recommendedLevel": "<Senior|Lead|Principal|Below Senior>",
   "summary": "<2-3 sentence summary of candidate's fit>",

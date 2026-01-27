@@ -1666,6 +1666,30 @@
             </div>
         </div>
 
+        <!-- Recently Analyzed Candidates -->
+        <div id="recentAnalysesSection" style="display: none; margin-bottom: 30px;">
+            <div style="background: var(--vysus-malmo-green); padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; cursor: pointer;" onclick="toggleRecentAnalyses()">
+                <h3 style="color: var(--vysus-white); font-size: 16px; font-weight: 400; margin: 0;">Recently Analyzed Candidates</h3>
+                <span id="recentAnalysesToggle" style="color: var(--vysus-stockholm-neon); font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">View</span>
+            </div>
+            <div id="recentAnalysesBody" style="display: none; background: var(--vysus-oslo-snow); max-height: 300px; overflow-y: auto;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: var(--vysus-stavanger-ice);">
+                            <th style="padding: 10px 16px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--vysus-malmo-green);">Candidate</th>
+                            <th style="padding: 10px 16px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--vysus-malmo-green);">Email</th>
+                            <th style="padding: 10px 16px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--vysus-malmo-green);">Position</th>
+                            <th style="padding: 10px 16px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--vysus-malmo-green);">Score</th>
+                            <th style="padding: 10px 16px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--vysus-malmo-green);">Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recentAnalysesList">
+                        <tr><td colspan="5" style="padding: 20px; text-align: center; color: var(--vysus-bergen-rain); font-size: 13px;">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
         <!-- Fixed Bottom Scoring Bar -->
         <div class="scoring-bar" id="scoringBar">
             <div class="scoring-bar-inner">
@@ -2303,7 +2327,6 @@
             const position = document.getElementById('resumeTargetPosition').value;
 
             if (!resumeFile) { alert('Please select a resume file.'); return; }
-            if (!name) { alert('Please enter the candidate name.'); return; }
 
             // Show loading
             document.getElementById('analyzingIndicator').classList.add('visible');
@@ -2331,17 +2354,34 @@
 
                 const analysis = await response.json();
 
+                // Auto-fill name and email from AI extraction if fields are empty
+                const nameField = document.getElementById('resumeCandidateName');
+                const emailField = document.getElementById('resumeCandidateEmail');
+                if (analysis.extractedName && !nameField.value) {
+                    nameField.value = analysis.extractedName;
+                }
+                if (analysis.extractedEmail && !emailField.value) {
+                    emailField.value = analysis.extractedEmail;
+                }
+
+                // Use the best available name and email (field value takes priority)
+                const finalName = nameField.value.trim() || analysis.extractedName || name;
+                const finalEmail = emailField.value.trim() || analysis.extractedEmail || email;
+
+                // Sync name back to field if AI provided it
+                if (finalName && !nameField.value) nameField.value = finalName;
+
                 // Save to database
                 try {
                     await saveResumeAnalysis({
-                        candidate_name: name,
-                        candidate_email: email,
+                        candidate_name: finalName,
+                        candidate_email: finalEmail,
                         target_position: position,
                         groq_analysis: analysis,
                         overall_score: analysis.overallScore,
                         recommendation: analysis.recommendation
                     });
-                    await logActivity('analyze_resume', { candidate: name, position, score: analysis.overallScore });
+                    await logActivity('analyze_resume', { candidate: finalName, position, score: analysis.overallScore });
                 } catch (dbErr) { console.log('DB save error (non-blocking):', dbErr); }
 
                 // Display results
@@ -2352,10 +2392,13 @@
 
                 // Auto-fill candidate name in scoring bar
                 const scoringName = document.getElementById('candidateName');
-                if (scoringName && !scoringName.value) scoringName.value = name;
+                if (scoringName && !scoringName.value) scoringName.value = finalName;
 
                 // Check if candidate was previously interviewed
-                await checkInterviewHistory(name);
+                await checkInterviewHistory(finalName);
+
+                // Refresh the recent analyses list
+                loadRecentAnalyses();
 
             } catch (err) {
                 console.error('Analysis error:', err);
@@ -2435,6 +2478,7 @@
             // Non-blocking background tasks
             updateLastLogin(session.user.id).catch(() => {});
             logActivity('view_screening_guide', { page: 'index.html' }).catch(() => {});
+            loadRecentAnalyses().catch(() => {});
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
@@ -2856,6 +2900,42 @@
                 content.innerHTML = html;
             } catch (err) {
                 content.innerHTML = '<p style="color: #F92D63; font-size: 13px;">Error loading analyses.</p>';
+            }
+        }
+
+        // Recently Analyzed Candidates list
+        function toggleRecentAnalyses() {
+            const body = document.getElementById('recentAnalysesBody');
+            const toggle = document.getElementById('recentAnalysesToggle');
+            const isOpen = body.style.display !== 'none';
+            body.style.display = isOpen ? 'none' : 'block';
+            toggle.textContent = isOpen ? 'View' : 'Close';
+        }
+
+        async function loadRecentAnalyses() {
+            const section = document.getElementById('recentAnalysesSection');
+            const tbody = document.getElementById('recentAnalysesList');
+            try {
+                const { data, error } = await getResumeAnalyses(20);
+                if (error) throw error;
+                if (!data || data.length === 0) {
+                    section.style.display = 'none';
+                    return;
+                }
+                section.style.display = 'block';
+                tbody.innerHTML = data.map(row => {
+                    const date = new Date(row.created_at).toLocaleDateString('en-AU', { day: '2-digit', month: 'short', year: 'numeric' });
+                    return `<tr style="border-bottom: 1px solid var(--vysus-bergen-rain);">
+                        <td style="padding: 10px 16px; font-size: 13px; font-weight: 500; color: var(--vysus-malmo-green);">${row.candidate_name}</td>
+                        <td style="padding: 10px 16px; font-size: 13px; color: var(--vysus-scandinavia-rock);">${row.candidate_email || '-'}</td>
+                        <td style="padding: 10px 16px; font-size: 13px; color: var(--vysus-scandinavia-rock);">${row.target_position || '-'}</td>
+                        <td style="padding: 10px 16px; font-size: 13px; color: var(--vysus-scandinavia-rock);">${row.overall_score != null ? row.overall_score + '%' : '-'}</td>
+                        <td style="padding: 10px 16px; font-size: 13px; color: var(--vysus-scandinavia-rock);">${date}</td>
+                    </tr>`;
+                }).join('');
+            } catch (err) {
+                console.log('Error loading recent analyses:', err);
+                section.style.display = 'none';
             }
         }
 
