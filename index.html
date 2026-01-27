@@ -1550,6 +1550,7 @@
                     <span id="userEmail" style="opacity: 0.8;"></span>
                     <div style="margin-top: 8px;">
                         <a href="/candidates.html" style="color: var(--vysus-stockholm-neon); text-decoration: none; margin-right: 16px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Candidates</a>
+                        <a href="/admin.html" id="adminGear" style="display: none; color: var(--vysus-stockholm-neon); text-decoration: none; margin-right: 16px; font-size: 18px; vertical-align: middle;" title="Admin Dashboard">&#9881;</a>
                         <button onclick="handleSignOut()" style="background: transparent; border: 1px solid rgba(255,255,255,0.3); color: var(--vysus-white); padding: 6px 12px; font-size: 11px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px;">Sign Out</button>
                     </div>
                 </div>
@@ -1594,26 +1595,6 @@
                     <button class="admin-tab" onclick="showUserTab('myAnalyses', this)">My Resume Analyses</button>
                 </div>
                 <div id="userContent">
-                    <p style="color: rgba(255,255,255,0.5); font-size: 13px;">Loading...</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Admin Dashboard - visible only to admin (chris.marinelli@vysusgroup.com) -->
-        <div class="admin-panel" id="adminPanel">
-            <div class="admin-panel-header" onclick="toggleAdminPanel()" style="background: var(--vysus-trondheim-night); border-bottom: 2px solid var(--vysus-stockholm-neon);">
-                <h3>Admin Dashboard</h3>
-                <span id="adminToggle">View All Activity</span>
-            </div>
-            <div class="admin-panel-body" id="adminBody">
-                <div class="admin-tabs">
-                    <button class="admin-tab active" onclick="showAdminTab('activity', this)">All Activity</button>
-                    <button class="admin-tab" onclick="showAdminTab('logins', this)">User Logins</button>
-                    <button class="admin-tab" onclick="showAdminTab('screenings', this)">All Screenings</button>
-                    <button class="admin-tab" onclick="showAdminTab('analyses', this)">All Analyses</button>
-                    <button class="admin-tab" onclick="showAdminTab('manageUsers', this)">Manage External Users</button>
-                </div>
-                <div id="adminContent">
                     <p style="color: rgba(255,255,255,0.5); font-size: 13px;">Loading...</p>
                 </div>
             </div>
@@ -2435,6 +2416,27 @@
         }
 
         // Initialize and check authentication
+        let authHandled = false;
+
+        function unlockApp(session) {
+            if (authHandled) return;
+            authHandled = true;
+            const overlay = document.getElementById('passwordOverlay');
+            const content = document.getElementById('protectedContent');
+            overlay.style.display = 'none';
+            content.classList.add('unlocked');
+            document.getElementById('userEmail').textContent = session.user.email;
+            document.getElementById('userPanel').classList.add('visible');
+
+            if (session.user.email === 'chris.marinelli@vysusgroup.com') {
+                document.getElementById('adminGear').style.display = 'inline';
+            }
+
+            // Non-blocking background tasks
+            updateLastLogin(session.user.id).catch(() => {});
+            logActivity('view_screening_guide', { page: 'index.html' }).catch(() => {});
+        }
+
         document.addEventListener('DOMContentLoaded', async () => {
             initSupabase();
 
@@ -2452,45 +2454,40 @@
                 content.classList.add('unlocked');
                 document.getElementById('userEmail').textContent = dev.email + ' (DEV)';
                 document.getElementById('userPanel').classList.add('visible');
-                document.getElementById('adminPanel').classList.add('visible');
-                console.log('Dev session active:', dev);
+                document.getElementById('adminGear').style.display = 'inline';
+                authHandled = true;
                 return;
             }
 
+            // Listen for auth state changes (handles token refresh, magic link callback)
+            sb.auth.onAuthStateChange((event, session) => {
+                if (session && (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION')) {
+                    unlockApp(session);
+                }
+            });
+
+            // Also do a direct session check as fallback
             try {
                 const { session } = await getSession();
-
                 if (session) {
-                    // User is authenticated - show content
-                    overlay.style.display = 'none';
-                    content.classList.add('unlocked');
-
-                    // Log activity and update last login
-                    await updateLastLogin(session.user.id);
-                    await logActivity('view_screening_guide', { page: 'index.html' });
-
-                    // Show user email
-                    document.getElementById('userEmail').textContent = session.user.email;
-
-                    // Show user panel for all authenticated users
-                    document.getElementById('userPanel').classList.add('visible');
-
-                    // Show admin panel for admin users only
-                    const adminEmails = ['chris.marinelli@vysusgroup.com'];
-                    if (adminEmails.includes(session.user.email)) {
-                        document.getElementById('adminPanel').classList.add('visible');
-                    }
+                    unlockApp(session);
                 } else {
-                    // User not authenticated - show login prompt
+                    // Wait briefly for onAuthStateChange to fire (magic link hash processing)
+                    setTimeout(() => {
+                        if (!authHandled) {
+                            authTitle.textContent = 'Authentication Required';
+                            authSubtitle.textContent = 'Please sign in to access this document.';
+                            loginPrompt.style.display = 'block';
+                        }
+                    }, 1500);
+                }
+            } catch (err) {
+                console.error('Auth check error:', err);
+                if (!authHandled) {
                     authTitle.textContent = 'Authentication Required';
                     authSubtitle.textContent = 'Please sign in to access this document.';
                     loginPrompt.style.display = 'block';
                 }
-            } catch (err) {
-                console.error('Auth check error:', err);
-                authTitle.textContent = 'Authentication Required';
-                authSubtitle.textContent = 'Please sign in to access this document.';
-                loginPrompt.style.display = 'block';
             }
         });
 
@@ -2859,180 +2856,6 @@
                 content.innerHTML = html;
             } catch (err) {
                 content.innerHTML = '<p style="color: #F92D63; font-size: 13px;">Error loading analyses.</p>';
-            }
-        }
-
-        // ===== ADMIN PANEL (all data - admin RLS policies) =====
-        function toggleAdminPanel() {
-            const body = document.getElementById('adminBody');
-            const toggle = document.getElementById('adminToggle');
-            body.classList.toggle('open');
-            toggle.textContent = body.classList.contains('open') ? 'Close' : 'View All Activity';
-            if (body.classList.contains('open')) loadAdminActivity();
-        }
-
-        function showAdminTab(tab, btn) {
-            document.querySelectorAll('#adminPanel .admin-tab').forEach(t => t.classList.remove('active'));
-            btn.classList.add('active');
-            if (tab === 'activity') loadAdminActivity();
-            else if (tab === 'logins') loadAdminLogins();
-            else if (tab === 'screenings') loadAdminScreenings();
-            else if (tab === 'analyses') loadAdminAnalyses();
-            else if (tab === 'manageUsers') loadManageUsers();
-        }
-
-        async function loadAdminActivity() {
-            const content = document.getElementById('adminContent');
-            content.innerHTML = '<p style="color: rgba(255,255,255,0.5); font-size: 13px;">Loading...</p>';
-            try {
-                const { data, error } = await getActivityLog(100);
-                if (error) throw error;
-                if (!data || data.length === 0) {
-                    content.innerHTML = '<p style="color: rgba(255,255,255,0.5); font-size: 13px;">No activity recorded yet.</p>';
-                    return;
-                }
-                let html = '<table class="admin-table"><thead><tr><th>Time</th><th>User</th><th>Action</th><th>Details</th></tr></thead><tbody>';
-                data.forEach(row => {
-                    const time = new Date(row.created_at).toLocaleString('en-AU', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
-                    const details = row.details ? Object.entries(row.details).map(([k,v]) => `${k}: ${v}`).join(', ') : '';
-                    html += `<tr><td>${time}</td><td>${row.user_email || '-'}</td><td>${row.action}</td><td style="font-size: 12px; opacity: 0.7;">${details}</td></tr>`;
-                });
-                html += '</tbody></table>';
-                content.innerHTML = html;
-            } catch (err) {
-                content.innerHTML = '<p style="color: #F92D63; font-size: 13px;">Error loading activity log.</p>';
-                console.error('Admin activity error:', err);
-            }
-        }
-
-        async function loadAdminLogins() {
-            const content = document.getElementById('adminContent');
-            content.innerHTML = '<p style="color: rgba(255,255,255,0.5); font-size: 13px;">Loading...</p>';
-            try {
-                const { data, error } = await sb.from('recruiter_profiles').select('*').order('last_login', { ascending: false });
-                if (error) throw error;
-                if (!data || data.length === 0) {
-                    content.innerHTML = '<p style="color: rgba(255,255,255,0.5); font-size: 13px;">No users found.</p>';
-                    return;
-                }
-                let html = '<table class="admin-table"><thead><tr><th>Email</th><th>Name</th><th>Role</th><th>Last Login</th><th>Registered</th></tr></thead><tbody>';
-                data.forEach(row => {
-                    const lastLogin = row.last_login ? new Date(row.last_login).toLocaleString('en-AU', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Never';
-                    const registered = new Date(row.created_at).toLocaleString('en-AU', { day: '2-digit', month: 'short', year: 'numeric' });
-                    const roleStyle = row.role === 'admin' ? 'color: var(--vysus-stockholm-neon); font-weight: 500;' : '';
-                    html += `<tr><td>${row.email}</td><td>${row.full_name || '-'}</td><td style="${roleStyle}">${row.role}</td><td>${lastLogin}</td><td>${registered}</td></tr>`;
-                });
-                html += '</tbody></table>';
-                content.innerHTML = html;
-            } catch (err) {
-                content.innerHTML = '<p style="color: #F92D63; font-size: 13px;">Error loading users. Admin access required.</p>';
-                console.error('Admin logins error:', err);
-            }
-        }
-
-        async function loadAdminScreenings() {
-            const content = document.getElementById('adminContent');
-            content.innerHTML = '<p style="color: rgba(255,255,255,0.5); font-size: 13px;">Loading...</p>';
-            try {
-                const { data, error } = await sb.from('screening_results').select('*').order('created_at', { ascending: false }).limit(50);
-                if (error) throw error;
-                if (!data || data.length === 0) {
-                    content.innerHTML = '<p style="color: rgba(255,255,255,0.5); font-size: 13px;">No screening results yet.</p>';
-                    return;
-                }
-                let html = '<table class="admin-table"><thead><tr><th>Date</th><th>Screened By</th><th>Candidate</th><th>Score</th><th>Result</th><th>Level</th><th>Prev. Interviewed</th></tr></thead><tbody>';
-                data.forEach(row => {
-                    const time = new Date(row.created_at).toLocaleString('en-AU', { day: '2-digit', month: 'short', year: 'numeric' });
-                    const prevInt = row.previously_interviewed ? '<span style="color: #F92D63;">Yes</span>' : '<span style="color: var(--vysus-stockholm-neon);">No</span>';
-                    html += `<tr><td>${time}</td><td>${row.screened_by_email || '-'}</td><td>${row.candidate_name}</td><td>${row.total_score}/${row.max_score} (${row.percentage}%)</td><td>${row.pass_fail || '-'}</td><td>${row.recommended_level || '-'}</td><td>${prevInt}</td></tr>`;
-                });
-                html += '</tbody></table>';
-                content.innerHTML = html;
-            } catch (err) {
-                content.innerHTML = '<p style="color: #F92D63; font-size: 13px;">Error loading screening results.</p>';
-                console.error('Admin screenings error:', err);
-            }
-        }
-
-        async function loadAdminAnalyses() {
-            const content = document.getElementById('adminContent');
-            content.innerHTML = '<p style="color: rgba(255,255,255,0.5); font-size: 13px;">Loading...</p>';
-            try {
-                const { data, error } = await getResumeAnalyses(50);
-                if (error) throw error;
-                if (!data || data.length === 0) {
-                    content.innerHTML = '<p style="color: rgba(255,255,255,0.5); font-size: 13px;">No resume analyses yet.</p>';
-                    return;
-                }
-                let html = '<table class="admin-table"><thead><tr><th>Date</th><th>Uploaded By</th><th>Candidate</th><th>Email</th><th>Position</th><th>Score</th><th>Recommendation</th></tr></thead><tbody>';
-                data.forEach(row => {
-                    const time = new Date(row.created_at).toLocaleString('en-AU', { day: '2-digit', month: 'short', year: 'numeric' });
-                    html += `<tr><td>${time}</td><td>${row.uploaded_by || '-'}</td><td>${row.candidate_name}</td><td>${row.candidate_email || '-'}</td><td>${row.target_position || '-'}</td><td>${row.overall_score || '-'}%</td><td>${row.recommendation || '-'}</td></tr>`;
-                });
-                html += '</tbody></table>';
-                content.innerHTML = html;
-            } catch (err) {
-                content.innerHTML = '<p style="color: #F92D63; font-size: 13px;">Error loading analyses.</p>';
-                console.error('Admin analyses error:', err);
-            }
-        }
-
-        async function loadManageUsers() {
-            const content = document.getElementById('adminContent');
-            content.innerHTML = '<p style="color: rgba(255,255,255,0.5); font-size: 13px;">Loading...</p>';
-            try {
-                const { data, error } = await sb.from('allowed_external_emails').select('*').order('created_at', { ascending: false });
-                if (error) throw error;
-
-                let html = '<div style="margin-bottom: 16px;">';
-                html += '<p style="color: rgba(255,255,255,0.6); font-size: 12px; margin-bottom: 12px;">All @vysusgroup.com emails can self-register. External users must be added here.</p>';
-                html += '<div style="display: flex; gap: 8px;">';
-                html += '<input type="email" id="newExternalEmail" placeholder="email@example.com" style="flex: 1; padding: 10px 14px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); color: white; font-size: 13px; font-family: inherit;">';
-                html += '<input type="text" id="newExternalNotes" placeholder="Notes (optional)" style="width: 200px; padding: 10px 14px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); color: white; font-size: 13px; font-family: inherit;">';
-                html += '<button onclick="addExternalUser()" style="padding: 10px 20px; background: var(--vysus-stockholm-neon); color: var(--vysus-malmo-green); border: none; font-size: 12px; font-weight: 500; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; font-family: inherit;">Add</button>';
-                html += '</div></div>';
-
-                if (!data || data.length === 0) {
-                    html += '<p style="color: rgba(255,255,255,0.5); font-size: 13px;">No external users added yet.</p>';
-                } else {
-                    html += '<table class="admin-table"><thead><tr><th>Email</th><th>Notes</th><th>Added</th><th></th></tr></thead><tbody>';
-                    data.forEach(row => {
-                        const time = new Date(row.created_at).toLocaleString('en-AU', { day: '2-digit', month: 'short', year: 'numeric' });
-                        html += `<tr><td>${row.email}</td><td style="font-size: 12px; opacity: 0.7;">${row.notes || '-'}</td><td>${time}</td><td><button onclick="removeExternalUser('${row.id}', '${row.email}')" style="background: transparent; border: 1px solid #F92D63; color: #F92D63; padding: 4px 12px; font-size: 11px; cursor: pointer; font-family: inherit;">Remove</button></td></tr>`;
-                    });
-                    html += '</tbody></table>';
-                }
-                content.innerHTML = html;
-            } catch (err) {
-                content.innerHTML = '<p style="color: #F92D63; font-size: 13px;">Error loading external users.</p>';
-                console.error('Manage users error:', err);
-            }
-        }
-
-        async function addExternalUser() {
-            const email = document.getElementById('newExternalEmail').value.trim().toLowerCase();
-            const notes = document.getElementById('newExternalNotes').value.trim();
-            if (!email || !email.includes('@')) { alert('Enter a valid email.'); return; }
-            if (email.endsWith('@vysusgroup.com')) { alert('Vysus emails are automatically allowed.'); return; }
-            try {
-                const { error } = await sb.from('allowed_external_emails').insert({ email, notes: notes || null });
-                if (error) throw error;
-                await logActivity('add_external_user', { email });
-                loadManageUsers();
-            } catch (err) {
-                alert('Error adding user: ' + (err.message || err));
-            }
-        }
-
-        async function removeExternalUser(id, email) {
-            if (!confirm('Remove access for ' + email + '?')) return;
-            try {
-                const { error } = await sb.from('allowed_external_emails').delete().eq('id', id);
-                if (error) throw error;
-                await logActivity('remove_external_user', { email });
-                loadManageUsers();
-            } catch (err) {
-                alert('Error removing user: ' + (err.message || err));
             }
         }
 

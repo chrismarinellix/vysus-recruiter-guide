@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Vysus Recruiter Guide</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --vysus-stockholm-neon: #00E3A9;
+            --vysus-malmo-green: #005454;
+            --vysus-white: #FFFFFF;
+            --vysus-oslo-snow: #F8F8F8;
+            --vysus-stavanger-ice: #EDEDED;
+            --vysus-bergen-rain: #DADADA;
+            --vysus-scandinavia-rock: #485559;
+            --vysus-trondheim-night: #1D1D1B;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            font-weight: 300;
+            background: var(--vysus-oslo-snow);
+            color: var(--vysus-scandinavia-rock);
+        }
+        .header {
+            background: var(--vysus-trondheim-night);
+            color: var(--vysus-white);
+            padding: 24px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 {
+            font-size: 22px;
+            font-weight: 400;
+            color: var(--vysus-stockholm-neon);
+        }
+        .header-nav {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+        .header-nav a {
+            color: var(--vysus-stockholm-neon);
+            text-decoration: none;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .header-nav a:hover { opacity: 0.8; }
+        .header-nav span {
+            color: rgba(255,255,255,0.6);
+            font-size: 13px;
+        }
+        .denied {
+            text-align: center;
+            padding: 100px 40px;
+            font-size: 18px;
+            color: var(--vysus-scandinavia-rock);
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 40px;
+            display: none;
+        }
+        .container.visible { display: block; }
+        .tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 24px;
+            border-bottom: 2px solid var(--vysus-stavanger-ice);
+            padding-bottom: 0;
+        }
+        .tab {
+            padding: 12px 20px;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: var(--vysus-scandinavia-rock);
+            font-size: 13px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-family: inherit;
+            font-weight: 400;
+            margin-bottom: -2px;
+        }
+        .tab:hover { color: var(--vysus-malmo-green); }
+        .tab.active {
+            border-bottom-color: var(--vysus-stockholm-neon);
+            color: var(--vysus-malmo-green);
+            font-weight: 500;
+        }
+        .panel { min-height: 300px; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--vysus-white);
+        }
+        th {
+            text-align: left;
+            padding: 12px 16px;
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--vysus-malmo-green);
+            background: var(--vysus-stavanger-ice);
+            border-bottom: 2px solid var(--vysus-bergen-rain);
+        }
+        td {
+            padding: 10px 16px;
+            font-size: 13px;
+            border-bottom: 1px solid var(--vysus-stavanger-ice);
+        }
+        tr:hover td { background: rgba(0, 227, 169, 0.04); }
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+        .badge-admin { background: var(--vysus-stockholm-neon); color: var(--vysus-malmo-green); }
+        .badge-recruiter { background: var(--vysus-stavanger-ice); color: var(--vysus-scandinavia-rock); }
+        .badge-pass { background: rgba(0, 227, 169, 0.15); color: var(--vysus-malmo-green); }
+        .badge-fail { background: rgba(249, 45, 99, 0.1); color: #F92D63; }
+        .empty { padding: 40px; text-align: center; color: var(--vysus-bergen-rain); font-size: 14px; }
+        .add-form {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            padding: 16px;
+            background: var(--vysus-white);
+            border: 1px solid var(--vysus-stavanger-ice);
+        }
+        .add-form input {
+            padding: 10px 14px;
+            border: 1px solid var(--vysus-bergen-rain);
+            font-size: 13px;
+            font-family: inherit;
+        }
+        .add-form input:focus { outline: none; border-color: var(--vysus-stockholm-neon); }
+        .add-form button {
+            padding: 10px 20px;
+            background: var(--vysus-stockholm-neon);
+            color: var(--vysus-malmo-green);
+            border: none;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-family: inherit;
+        }
+        .add-form button:hover { background: var(--vysus-malmo-green); color: var(--vysus-white); }
+        .remove-btn {
+            background: transparent;
+            border: 1px solid #F92D63;
+            color: #F92D63;
+            padding: 4px 12px;
+            font-size: 11px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .remove-btn:hover { background: #F92D63; color: white; }
+        .info { font-size: 12px; color: var(--vysus-scandinavia-rock); margin-bottom: 12px; }
+        .loading { padding: 40px; text-align: center; color: var(--vysus-bergen-rain); }
+        .footer {
+            text-align: center;
+            padding: 30px;
+            font-size: 11px;
+            color: var(--vysus-bergen-rain);
+            border-top: 1px solid var(--vysus-stavanger-ice);
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Admin Dashboard</h1>
+        <div class="header-nav">
+            <span id="adminEmail"></span>
+            <a href="/index.html">Screening Guide</a>
+            <a href="/candidates.html">Candidates</a>
+        </div>
+    </div>
+
+    <div id="denied" class="denied" style="display: none;">
+        <p>Admin access required.</p>
+        <p style="margin-top: 12px;"><a href="/index.html" style="color: var(--vysus-stockholm-neon);">Back to Screening Guide</a></p>
+    </div>
+
+    <div class="container" id="adminContainer">
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('activity', this)">All Activity</button>
+            <button class="tab" onclick="showTab('logins', this)">User Logins</button>
+            <button class="tab" onclick="showTab('screenings', this)">All Screenings</button>
+            <button class="tab" onclick="showTab('analyses', this)">All Analyses</button>
+            <button class="tab" onclick="showTab('manageUsers', this)">Manage External Users</button>
+        </div>
+        <div class="panel" id="panel">
+            <div class="loading">Loading...</div>
+        </div>
+    </div>
+
+    <div class="footer">Tool developed by CM</div>
+
+    <script src="js/supabase-client.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            initSupabase();
+
+            // Dev session check
+            const devSession = localStorage.getItem('vysus_dev_session');
+            if (devSession) {
+                document.getElementById('adminEmail').textContent = JSON.parse(devSession).email + ' (DEV)';
+                document.getElementById('adminContainer').classList.add('visible');
+                loadActivity();
+                return;
+            }
+
+            // Auth check
+            const { session } = await getSession();
+            if (!session || session.user.email !== 'chris.marinelli@vysusgroup.com') {
+                document.getElementById('denied').style.display = 'block';
+                return;
+            }
+
+            document.getElementById('adminEmail').textContent = session.user.email;
+            document.getElementById('adminContainer').classList.add('visible');
+            loadActivity();
+        });
+
+        function showTab(tab, btn) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            btn.classList.add('active');
+            if (tab === 'activity') loadActivity();
+            else if (tab === 'logins') loadLogins();
+            else if (tab === 'screenings') loadScreenings();
+            else if (tab === 'analyses') loadAnalyses();
+            else if (tab === 'manageUsers') loadManageUsers();
+        }
+
+        async function loadActivity() {
+            const panel = document.getElementById('panel');
+            panel.innerHTML = '<div class="loading">Loading...</div>';
+            try {
+                const { data, error } = await getActivityLog(200);
+                if (error) throw error;
+                if (!data || data.length === 0) { panel.innerHTML = '<div class="empty">No activity recorded yet.</div>'; return; }
+
+                let html = '<table><thead><tr><th>Time</th><th>User</th><th>Action</th><th>Details</th></tr></thead><tbody>';
+                data.forEach(row => {
+                    const time = new Date(row.created_at).toLocaleString('en-AU', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+                    const details = row.details ? Object.entries(row.details).map(([k,v]) => `${k}: ${v}`).join(', ') : '';
+                    html += `<tr><td style="white-space:nowrap;">${time}</td><td>${row.user_email || '-'}</td><td>${row.action}</td><td style="font-size: 12px; opacity: 0.7;">${details}</td></tr>`;
+                });
+                html += '</tbody></table>';
+                panel.innerHTML = html;
+            } catch (err) {
+                panel.innerHTML = '<div class="empty" style="color:#F92D63;">Error loading activity: ' + (err.message || err) + '</div>';
+            }
+        }
+
+        async function loadLogins() {
+            const panel = document.getElementById('panel');
+            panel.innerHTML = '<div class="loading">Loading...</div>';
+            try {
+                const { data, error } = await sb.from('recruiter_profiles').select('*').order('last_login', { ascending: false });
+                if (error) throw error;
+                if (!data || data.length === 0) { panel.innerHTML = '<div class="empty">No users found.</div>'; return; }
+
+                let html = '<table><thead><tr><th>Email</th><th>Name</th><th>Role</th><th>Last Login</th><th>Registered</th></tr></thead><tbody>';
+                data.forEach(row => {
+                    const lastLogin = row.last_login ? new Date(row.last_login).toLocaleString('en-AU', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Never';
+                    const registered = new Date(row.created_at).toLocaleString('en-AU', { day: '2-digit', month: 'short', year: 'numeric' });
+                    const badge = row.role === 'admin' ? '<span class="badge badge-admin">admin</span>' : '<span class="badge badge-recruiter">recruiter</span>';
+                    html += `<tr><td>${row.email}</td><td>${row.full_name || '-'}</td><td>${badge}</td><td>${lastLogin}</td><td>${registered}</td></tr>`;
+                });
+                html += '</tbody></table>';
+                panel.innerHTML = html;
+            } catch (err) {
+                panel.innerHTML = '<div class="empty" style="color:#F92D63;">Error loading users: ' + (err.message || err) + '</div>';
+            }
+        }
+
+        async function loadScreenings() {
+            const panel = document.getElementById('panel');
+            panel.innerHTML = '<div class="loading">Loading...</div>';
+            try {
+                const { data, error } = await sb.from('screening_results').select('*').order('created_at', { ascending: false }).limit(100);
+                if (error) throw error;
+                if (!data || data.length === 0) { panel.innerHTML = '<div class="empty">No screening results yet.</div>'; return; }
+
+                let html = '<table><thead><tr><th>Date</th><th>Screened By</th><th>Candidate</th><th>Score</th><th>Result</th><th>Level</th><th>Prev. Interviewed</th></tr></thead><tbody>';
+                data.forEach(row => {
+                    const time = new Date(row.created_at).toLocaleString('en-AU', { day: '2-digit', month: 'short', year: 'numeric' });
+                    const passBadge = (row.pass_fail || '').includes('PASS') ? '<span class="badge badge-pass">' + row.pass_fail + '</span>' : '<span class="badge badge-fail">' + (row.pass_fail || '-') + '</span>';
+                    const prevInt = row.previously_interviewed ? '<span style="color: #F92D63;">&#10007; Yes</span>' : '<span style="color: var(--vysus-stockholm-neon);">&#10003; No</span>';
+                    html += `<tr><td>${time}</td><td>${row.screened_by_email || '-'}</td><td>${row.candidate_name}</td><td>${row.total_score || 0}/${row.max_score || 45} (${row.percentage || 0}%)</td><td>${passBadge}</td><td>${row.recommended_level || '-'}</td><td>${prevInt}</td></tr>`;
+                });
+                html += '</tbody></table>';
+                panel.innerHTML = html;
+            } catch (err) {
+                panel.innerHTML = '<div class="empty" style="color:#F92D63;">Error loading screenings: ' + (err.message || err) + '</div>';
+            }
+        }
+
+        async function loadAnalyses() {
+            const panel = document.getElementById('panel');
+            panel.innerHTML = '<div class="loading">Loading...</div>';
+            try {
+                const { data, error } = await getResumeAnalyses(100);
+                if (error) throw error;
+                if (!data || data.length === 0) { panel.innerHTML = '<div class="empty">No resume analyses yet.</div>'; return; }
+
+                let html = '<table><thead><tr><th>Date</th><th>Candidate</th><th>Email</th><th>Position</th><th>Score</th><th>Recommendation</th></tr></thead><tbody>';
+                data.forEach(row => {
+                    const time = new Date(row.created_at).toLocaleString('en-AU', { day: '2-digit', month: 'short', year: 'numeric' });
+                    html += `<tr><td>${time}</td><td>${row.candidate_name}</td><td>${row.candidate_email || '-'}</td><td>${row.target_position || '-'}</td><td>${row.overall_score || '-'}%</td><td>${row.recommendation || '-'}</td></tr>`;
+                });
+                html += '</tbody></table>';
+                panel.innerHTML = html;
+            } catch (err) {
+                panel.innerHTML = '<div class="empty" style="color:#F92D63;">Error loading analyses: ' + (err.message || err) + '</div>';
+            }
+        }
+
+        async function loadManageUsers() {
+            const panel = document.getElementById('panel');
+            panel.innerHTML = '<div class="loading">Loading...</div>';
+            try {
+                const { data, error } = await sb.from('allowed_external_emails').select('*').order('created_at', { ascending: false });
+                if (error) throw error;
+
+                let html = '<p class="info">All @vysusgroup.com emails can self-register via magic link. External users must be added here before they can log in.</p>';
+                html += '<div class="add-form">';
+                html += '<input type="email" id="newEmail" placeholder="email@example.com" style="flex: 1;">';
+                html += '<input type="text" id="newNotes" placeholder="Notes (optional)" style="width: 220px;">';
+                html += '<button onclick="addUser()">Add External User</button>';
+                html += '</div>';
+
+                if (!data || data.length === 0) {
+                    html += '<div class="empty">No external users added yet.</div>';
+                } else {
+                    html += '<table><thead><tr><th>Email</th><th>Notes</th><th>Added</th><th></th></tr></thead><tbody>';
+                    data.forEach(row => {
+                        const time = new Date(row.created_at).toLocaleString('en-AU', { day: '2-digit', month: 'short', year: 'numeric' });
+                        html += `<tr><td>${row.email}</td><td style="opacity:0.7;">${row.notes || '-'}</td><td>${time}</td><td><button class="remove-btn" onclick="removeUser('${row.id}', '${row.email}')">Remove</button></td></tr>`;
+                    });
+                    html += '</tbody></table>';
+                }
+                panel.innerHTML = html;
+            } catch (err) {
+                panel.innerHTML = '<div class="empty" style="color:#F92D63;">Error loading external users: ' + (err.message || err) + '</div>';
+            }
+        }
+
+        async function addUser() {
+            const email = document.getElementById('newEmail').value.trim().toLowerCase();
+            const notes = document.getElementById('newNotes').value.trim();
+            if (!email || !email.includes('@')) { alert('Enter a valid email.'); return; }
+            if (email.endsWith('@vysusgroup.com')) { alert('Vysus emails are automatically allowed.'); return; }
+            try {
+                const { error } = await sb.from('allowed_external_emails').insert({ email, notes: notes || null });
+                if (error) throw error;
+                await logActivity('add_external_user', { email });
+                loadManageUsers();
+            } catch (err) {
+                alert('Error: ' + (err.message || err));
+            }
+        }
+
+        async function removeUser(id, email) {
+            if (!confirm('Remove access for ' + email + '?')) return;
+            try {
+                const { error } = await sb.from('allowed_external_emails').delete().eq('id', id);
+                if (error) throw error;
+                await logActivity('remove_external_user', { email });
+                loadManageUsers();
+            } catch (err) {
+                alert('Error: ' + (err.message || err));
+            }
+        }
+    </script>
+</body>
+</html>
