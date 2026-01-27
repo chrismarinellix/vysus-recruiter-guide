@@ -1611,6 +1611,7 @@
                     <button class="admin-tab" onclick="showAdminTab('logins', this)">User Logins</button>
                     <button class="admin-tab" onclick="showAdminTab('screenings', this)">All Screenings</button>
                     <button class="admin-tab" onclick="showAdminTab('analyses', this)">All Analyses</button>
+                    <button class="admin-tab" onclick="showAdminTab('manageUsers', this)">Manage External Users</button>
                 </div>
                 <div id="adminContent">
                     <p style="color: rgba(255,255,255,0.5); font-size: 13px;">Loading...</p>
@@ -2475,7 +2476,7 @@
                     document.getElementById('userPanel').classList.add('visible');
 
                     // Show admin panel for admin users only
-                    const adminEmails = ['chris.marinelli@vysusgroup.com', 'jasmine@designandbuild.com.au'];
+                    const adminEmails = ['chris.marinelli@vysusgroup.com'];
                     if (adminEmails.includes(session.user.email)) {
                         document.getElementById('adminPanel').classList.add('visible');
                     }
@@ -2877,6 +2878,7 @@
             else if (tab === 'logins') loadAdminLogins();
             else if (tab === 'screenings') loadAdminScreenings();
             else if (tab === 'analyses') loadAdminAnalyses();
+            else if (tab === 'manageUsers') loadManageUsers();
         }
 
         async function loadAdminActivity() {
@@ -2972,6 +2974,65 @@
             } catch (err) {
                 content.innerHTML = '<p style="color: #F92D63; font-size: 13px;">Error loading analyses.</p>';
                 console.error('Admin analyses error:', err);
+            }
+        }
+
+        async function loadManageUsers() {
+            const content = document.getElementById('adminContent');
+            content.innerHTML = '<p style="color: rgba(255,255,255,0.5); font-size: 13px;">Loading...</p>';
+            try {
+                const { data, error } = await sb.from('allowed_external_emails').select('*').order('created_at', { ascending: false });
+                if (error) throw error;
+
+                let html = '<div style="margin-bottom: 16px;">';
+                html += '<p style="color: rgba(255,255,255,0.6); font-size: 12px; margin-bottom: 12px;">All @vysusgroup.com emails can self-register. External users must be added here.</p>';
+                html += '<div style="display: flex; gap: 8px;">';
+                html += '<input type="email" id="newExternalEmail" placeholder="email@example.com" style="flex: 1; padding: 10px 14px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); color: white; font-size: 13px; font-family: inherit;">';
+                html += '<input type="text" id="newExternalNotes" placeholder="Notes (optional)" style="width: 200px; padding: 10px 14px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); color: white; font-size: 13px; font-family: inherit;">';
+                html += '<button onclick="addExternalUser()" style="padding: 10px 20px; background: var(--vysus-stockholm-neon); color: var(--vysus-malmo-green); border: none; font-size: 12px; font-weight: 500; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; font-family: inherit;">Add</button>';
+                html += '</div></div>';
+
+                if (!data || data.length === 0) {
+                    html += '<p style="color: rgba(255,255,255,0.5); font-size: 13px;">No external users added yet.</p>';
+                } else {
+                    html += '<table class="admin-table"><thead><tr><th>Email</th><th>Notes</th><th>Added</th><th></th></tr></thead><tbody>';
+                    data.forEach(row => {
+                        const time = new Date(row.created_at).toLocaleString('en-AU', { day: '2-digit', month: 'short', year: 'numeric' });
+                        html += `<tr><td>${row.email}</td><td style="font-size: 12px; opacity: 0.7;">${row.notes || '-'}</td><td>${time}</td><td><button onclick="removeExternalUser('${row.id}', '${row.email}')" style="background: transparent; border: 1px solid #F92D63; color: #F92D63; padding: 4px 12px; font-size: 11px; cursor: pointer; font-family: inherit;">Remove</button></td></tr>`;
+                    });
+                    html += '</tbody></table>';
+                }
+                content.innerHTML = html;
+            } catch (err) {
+                content.innerHTML = '<p style="color: #F92D63; font-size: 13px;">Error loading external users.</p>';
+                console.error('Manage users error:', err);
+            }
+        }
+
+        async function addExternalUser() {
+            const email = document.getElementById('newExternalEmail').value.trim().toLowerCase();
+            const notes = document.getElementById('newExternalNotes').value.trim();
+            if (!email || !email.includes('@')) { alert('Enter a valid email.'); return; }
+            if (email.endsWith('@vysusgroup.com')) { alert('Vysus emails are automatically allowed.'); return; }
+            try {
+                const { error } = await sb.from('allowed_external_emails').insert({ email, notes: notes || null });
+                if (error) throw error;
+                await logActivity('add_external_user', { email });
+                loadManageUsers();
+            } catch (err) {
+                alert('Error adding user: ' + (err.message || err));
+            }
+        }
+
+        async function removeExternalUser(id, email) {
+            if (!confirm('Remove access for ' + email + '?')) return;
+            try {
+                const { error } = await sb.from('allowed_external_emails').delete().eq('id', id);
+                if (error) throw error;
+                await logActivity('remove_external_user', { email });
+                loadManageUsers();
+            } catch (err) {
+                alert('Error removing user: ' + (err.message || err));
             }
         }
 

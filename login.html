@@ -245,6 +245,20 @@
                 return;
             }
 
+            // Check if email is allowed (vysusgroup.com or whitelisted external)
+            if (!email.endsWith('@vysusgroup.com')) {
+                try {
+                    const { data } = await sb.from('allowed_external_emails').select('email').eq('email', email.toLowerCase()).single();
+                    if (!data) {
+                        showMessage('Access restricted. Only @vysusgroup.com emails or pre-approved external users can sign in. Contact chris.marinelli@vysusgroup.com for access.', 'error');
+                        return;
+                    }
+                } catch (checkErr) {
+                    showMessage('Access restricted. Only @vysusgroup.com emails or pre-approved external users can sign in. Contact chris.marinelli@vysusgroup.com for access.', 'error');
+                    return;
+                }
+            }
+
             // Show loading state
             submitBtn.disabled = true;
             btnText.classList.add('hidden');
