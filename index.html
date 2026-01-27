@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recruiter Pre-Screening Guide | Vysus Group</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        if (typeof pdfjsLib !== 'undefined') {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        }
+    </script>
     <style>
         :root {
             /* Primary */
@@ -1550,8 +1556,22 @@
                     <span id="userEmail" style="opacity: 0.8;"></span>
                     <div style="margin-top: 8px;">
                         <a href="/candidates.html" style="color: var(--vysus-stockholm-neon); text-decoration: none; margin-right: 16px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Candidates</a>
+                        <a href="#" onclick="showSetPassword(); return false;" style="color: var(--vysus-stockholm-neon); text-decoration: none; margin-right: 16px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Set Password</a>
                         <a href="/admin.html" id="adminGear" style="display: none; color: var(--vysus-stockholm-neon); text-decoration: none; margin-right: 16px; font-size: 18px; vertical-align: middle;" title="Admin Dashboard">&#9881;</a>
                         <button onclick="handleSignOut()" style="background: transparent; border: 1px solid rgba(255,255,255,0.3); color: var(--vysus-white); padding: 6px 12px; font-size: 11px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px;">Sign Out</button>
+                    </div>
+                </div>
+
+                <!-- Set Password Modal -->
+                <div id="setPasswordModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; display: none; align-items: center; justify-content: center;">
+                    <div style="background: var(--vysus-white); padding: 40px; max-width: 400px; width: 90%; text-align: center;">
+                        <h3 style="color: var(--vysus-malmo-green); font-size: 20px; font-weight: 400; margin-bottom: 8px;">Set Your Password</h3>
+                        <p style="color: var(--vysus-scandinavia-rock); font-size: 13px; margin-bottom: 24px;">Set a password so you can sign in without a magic link.</p>
+                        <input type="password" id="newPassword" placeholder="New password (min 6 characters)" style="width: 100%; padding: 14px; border: 2px solid var(--vysus-bergen-rain); font-size: 15px; font-family: inherit; margin-bottom: 12px;">
+                        <input type="password" id="confirmPassword" placeholder="Confirm password" style="width: 100%; padding: 14px; border: 2px solid var(--vysus-bergen-rain); font-size: 15px; font-family: inherit; margin-bottom: 16px;">
+                        <div id="passwordMessage" style="display: none; padding: 10px; font-size: 13px; margin-bottom: 12px;"></div>
+                        <button onclick="savePassword()" style="width: 100%; padding: 14px; background: var(--vysus-stockholm-neon); color: var(--vysus-malmo-green); border: none; font-size: 15px; font-weight: 500; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;">Save Password</button>
+                        <button onclick="closeSetPassword()" style="width: 100%; padding: 10px; background: transparent; border: none; color: var(--vysus-scandinavia-rock); font-size: 13px; cursor: pointer; margin-top: 8px;">Cancel</button>
                     </div>
                 </div>
             </div>
@@ -1623,6 +1643,12 @@
                     <input type="file" id="resumeFileInput" accept=".pdf,.doc,.docx,.txt" style="display:none">
                     <button class="upload-btn-sm" onclick="document.getElementById('resumeFileInput').click()">Choose File</button>
                     <div class="file-selected" id="fileSelected"><strong>Selected:</strong> <span id="selectedFileName"></span></div>
+                    <div style="margin-top: 12px; text-align: center;">
+                        <button type="button" onclick="togglePasteArea()" style="background: transparent; border: 1px solid var(--vysus-bergen-rain); color: var(--vysus-scandinavia-rock); padding: 8px 16px; font-size: 12px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px;">Or Paste Resume Text</button>
+                    </div>
+                    <div id="pasteArea" style="display: none; margin-top: 12px;">
+                        <textarea id="resumePasteText" placeholder="Paste the full resume text here..." style="width: 100%; min-height: 150px; padding: 12px; border: 2px solid var(--vysus-bergen-rain); font-size: 13px; font-family: inherit; line-height: 1.5; resize: vertical;"></textarea>
+                    </div>
                 </div>
                 <div class="analyzer-form-row">
                     <div class="form-group">
@@ -2312,21 +2338,50 @@
         }
 
         function readResumeText(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = (e) => resolve(e.target.result);
-                reader.onerror = reject;
-                if (file.type === 'application/pdf') reader.readAsDataURL(file);
-                else reader.readAsText(file);
+            return new Promise(async (resolve, reject) => {
+                try {
+                    if (file.type === 'application/pdf') {
+                        // Use PDF.js for actual text extraction
+                        const arrayBuffer = await file.arrayBuffer();
+                        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                        let fullText = '';
+                        for (let i = 1; i <= pdf.numPages; i++) {
+                            const page = await pdf.getPage(i);
+                            const content = await page.getTextContent();
+                            const pageText = content.items.map(item => item.str).join(' ');
+                            fullText += pageText + '\n';
+                        }
+                        resolve(fullText);
+                    } else {
+                        // Text/DOC files
+                        const reader = new FileReader();
+                        reader.onload = (e) => resolve(e.target.result);
+                        reader.onerror = reject;
+                        reader.readAsText(file);
+                    }
+                } catch (err) {
+                    reject(err);
+                }
             });
+        }
+
+        function togglePasteArea() {
+            const area = document.getElementById('pasteArea');
+            area.style.display = area.style.display === 'none' ? 'block' : 'none';
+            if (area.style.display === 'block') {
+                document.getElementById('resumePasteText').focus();
+                // Enable analyze button if paste area is shown
+                document.getElementById('analyzeResumeBtn').disabled = false;
+            }
         }
 
         async function runAnalysis() {
             const name = document.getElementById('resumeCandidateName').value.trim();
             const email = document.getElementById('resumeCandidateEmail').value.trim();
             const position = document.getElementById('resumeTargetPosition').value;
+            const pastedText = document.getElementById('resumePasteText').value.trim();
 
-            if (!resumeFile) { alert('Please select a resume file.'); return; }
+            if (!resumeFile && !pastedText) { alert('Please select a resume file or paste resume text.'); return; }
 
             // Show loading
             document.getElementById('analyzingIndicator').classList.add('visible');
@@ -2337,7 +2392,7 @@
             clearSkillHighlights();
 
             try {
-                const fileContent = await readResumeText(resumeFile);
+                const fileContent = pastedText || await readResumeText(resumeFile);
 
                 const response = await fetch('/.netlify/functions/analyze-resume', {
                     method: 'POST',
@@ -2534,6 +2589,59 @@
                 }
             }
         });
+
+        // Set Password functions
+        function showSetPassword() {
+            const modal = document.getElementById('setPasswordModal');
+            modal.style.display = 'flex';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+            document.getElementById('passwordMessage').style.display = 'none';
+        }
+
+        function closeSetPassword() {
+            document.getElementById('setPasswordModal').style.display = 'none';
+        }
+
+        async function savePassword() {
+            const password = document.getElementById('newPassword').value;
+            const confirm = document.getElementById('confirmPassword').value;
+            const msg = document.getElementById('passwordMessage');
+
+            if (!password || password.length < 6) {
+                msg.style.display = 'block';
+                msg.style.background = 'rgba(249, 45, 99, 0.1)';
+                msg.style.color = '#F92D63';
+                msg.textContent = 'Password must be at least 6 characters.';
+                return;
+            }
+
+            if (password !== confirm) {
+                msg.style.display = 'block';
+                msg.style.background = 'rgba(249, 45, 99, 0.1)';
+                msg.style.color = '#F92D63';
+                msg.textContent = 'Passwords do not match.';
+                return;
+            }
+
+            try {
+                const { data, error } = await sb.auth.updateUser({ password: password });
+                if (error) throw error;
+
+                msg.style.display = 'block';
+                msg.style.background = 'rgba(0, 227, 169, 0.15)';
+                msg.style.color = '#005454';
+                msg.textContent = 'Password set successfully! You can now sign in with email + password.';
+                await logActivity('set_password', {});
+
+                setTimeout(() => closeSetPassword(), 2000);
+            } catch (err) {
+                msg.style.display = 'block';
+                msg.style.background = 'rgba(249, 45, 99, 0.1)';
+                msg.style.color = '#F92D63';
+                msg.textContent = err.message || 'Failed to set password.';
+            }
+        }
 
         // Sign out handler
         async function handleSignOut() {
