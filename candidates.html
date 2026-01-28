@@ -347,6 +347,7 @@
             <div class="nav-links">
                 <a href="/index.html">Screening Guide</a>
                 <a href="/resume-analyzer.html">Resume Analyzer</a>
+                <a href="/admin.html" id="adminGear" style="display: none; color: var(--vysus-stockholm-neon); text-decoration: none; font-size: 18px; vertical-align: middle;" title="Admin Dashboard">&#9881;</a>
                 <button onclick="handleSignOut()">Sign Out</button>
             </div>
         </div>
@@ -452,12 +453,17 @@
 
             // Check for dev session first (localhost testing)
             const devSession = localStorage.getItem('vysus_dev_session');
-            if (!devSession) {
+            if (devSession) {
+                document.getElementById('adminGear').style.display = 'inline';
+            } else {
                 // Check real auth
                 const { session } = await getSession();
                 if (!session) {
                     window.location.href = '/login.html';
                     return;
+                }
+                if (session.user.email === 'chris.marinelli@vysusgroup.com') {
+                    document.getElementById('adminGear').style.display = 'inline';
                 }
                 // Log activity
                 await logActivity('view_candidates_page', {});
