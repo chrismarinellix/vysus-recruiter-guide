@@ -200,6 +200,20 @@
 
         .divider::before { margin-right: 12px; }
         .divider::after { margin-left: 12px; }
+
+        .forgot-link {
+            display: block;
+            text-align: right;
+            margin-top: 12px;
+            color: var(--vysus-scandinavia-rock);
+            font-size: 13px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .forgot-link:hover {
+            color: var(--vysus-stockholm-neon);
+        }
     </style>
 </head>
 <body>
@@ -210,10 +224,10 @@
         </svg>
 
         <h1>Recruiter Portal</h1>
-        <p class="subtitle">Sign in to access the pre-screening guide</p>
+        <p class="subtitle" id="pageSubtitle">Sign in to access the pre-screening guide</p>
 
-        <!-- Password Login (primary) -->
-        <form id="passwordForm">
+        <!-- Sign In Form -->
+        <form id="loginForm">
             <div class="form-group">
                 <label for="email">Email Address</label>
                 <input type="email" id="email" placeholder="your.email@vysusgroup.com" required>
@@ -223,24 +237,79 @@
                 <input type="password" id="password" placeholder="Enter your password" required>
             </div>
 
-            <button type="submit" class="login-btn" id="passwordBtn">
-                <span id="passwordBtnText">Sign In</span>
-                <span id="passwordBtnLoading" class="hidden"><span class="spinner"></span>Signing in...</span>
+            <button type="submit" class="login-btn" id="loginBtn">
+                <span id="loginBtnText">Sign In</span>
+                <span id="loginBtnLoading" class="hidden"><span class="spinner"></span>Signing in...</span>
+            </button>
+
+            <a class="forgot-link" onclick="showResetForm()">Forgot password?</a>
+        </form>
+
+        <!-- Sign Up Form (hidden by default) -->
+        <form id="signupForm" style="display: none;">
+            <div class="form-group">
+                <label for="signupEmail">Email Address</label>
+                <input type="email" id="signupEmail" placeholder="your.email@vysusgroup.com" required>
+            </div>
+            <div class="form-group">
+                <label for="signupPassword">Password</label>
+                <input type="password" id="signupPassword" placeholder="Min 6 characters" required minlength="6">
+            </div>
+            <div class="form-group">
+                <label for="signupConfirm">Confirm Password</label>
+                <input type="password" id="signupConfirm" placeholder="Confirm your password" required>
+            </div>
+
+            <button type="submit" class="login-btn" id="signupBtn">
+                <span id="signupBtnText">Create Account</span>
+                <span id="signupBtnLoading" class="hidden"><span class="spinner"></span>Creating account...</span>
+            </button>
+
+            <button type="button" class="login-btn secondary" onclick="showLoginForm()">Back to Sign In</button>
+        </form>
+
+        <!-- Password Reset Form (hidden by default) -->
+        <div id="resetForm" style="display: none;">
+            <div class="form-group">
+                <label for="resetEmail">Email Address</label>
+                <input type="email" id="resetEmail" placeholder="your.email@vysusgroup.com" required>
+            </div>
+
+            <button type="button" class="login-btn" id="resetBtn" onclick="sendReset()">
+                <span id="resetBtnText">Send Reset Link</span>
+                <span id="resetBtnLoading" class="hidden"><span class="spinner"></span>Sending...</span>
+            </button>
+
+            <button type="button" class="login-btn secondary" onclick="showLoginForm()">Back to Sign In</button>
+        </div>
+
+        <!-- Update Password Form (shown after reset callback) -->
+        <form id="updatePasswordForm" style="display: none;">
+            <div class="form-group">
+                <label for="newPassword">New Password</label>
+                <input type="password" id="newPassword" placeholder="Min 6 characters" required minlength="6">
+            </div>
+            <div class="form-group">
+                <label for="confirmNewPassword">Confirm New Password</label>
+                <input type="password" id="confirmNewPassword" placeholder="Confirm new password" required>
+            </div>
+
+            <button type="submit" class="login-btn" id="updateBtn">
+                <span id="updateBtnText">Update Password</span>
+                <span id="updateBtnLoading" class="hidden"><span class="spinner"></span>Updating...</span>
             </button>
         </form>
 
-        <div class="divider">or</div>
-
-        <!-- Magic Link (backup) -->
-        <button type="button" class="login-btn secondary" id="magicLinkBtn" onclick="sendMagicLink()">
-            <span id="magicBtnText">Send Magic Link Instead</span>
-            <span id="magicBtnLoading" class="hidden"><span class="spinner"></span>Sending...</span>
-        </button>
+        <!-- Toggle to signup -->
+        <div class="divider" id="signupDivider">or</div>
+        <div id="signupToggle">
+            <button type="button" class="login-btn secondary" onclick="showSignupForm()">Create Account</button>
+        </div>
 
         <div class="message" id="message"></div>
 
-        <div class="footer-note">
-            <p>First time? Use the magic link to sign in, then set a password from the main page.</p>
+        <div class="footer-note" id="footerNote">
+            <p>First time? Click "Create Account" to sign up with your Vysus email.</p>
             <p style="margin-top: 8px;">Need access? Contact <a href="mailto:chris.marinelli@vysusgroup.com">chris.marinelli@vysusgroup.com</a></p>
         </div>
 
@@ -258,6 +327,14 @@
         document.addEventListener('DOMContentLoaded', async () => {
             initSupabase();
 
+            // Check for password reset callback
+            const hashParams = new URLSearchParams(window.location.hash.substring(1));
+            const type = hashParams.get('type');
+            if (type === 'recovery') {
+                showUpdatePasswordForm();
+                return;
+            }
+
             // Check if already logged in
             const { session } = await getSession();
             if (session) {
@@ -265,8 +342,7 @@
                 return;
             }
 
-            // Check for auth callback (magic link redirect)
-            const hashParams = new URLSearchParams(window.location.hash.substring(1));
+            // Check for auth callback (access token in URL)
             const accessToken = hashParams.get('access_token');
             if (accessToken) {
                 window.location.href = '/index.html';
@@ -274,15 +350,15 @@
             }
         });
 
-        // Password login (primary)
-        document.getElementById('passwordForm').addEventListener('submit', async (e) => {
+        // --- Sign In ---
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
-            const btn = document.getElementById('passwordBtn');
-            const btnText = document.getElementById('passwordBtnText');
-            const btnLoading = document.getElementById('passwordBtnLoading');
+            const btn = document.getElementById('loginBtn');
+            const btnText = document.getElementById('loginBtnText');
+            const btnLoading = document.getElementById('loginBtnLoading');
 
             if (!email || !password) {
                 showMessage('Please enter email and password.', 'error');
@@ -290,18 +366,8 @@
             }
 
             // Check if email is allowed
-            if (!email.endsWith('@vysusgroup.com')) {
-                try {
-                    const { data } = await sb.from('allowed_external_emails').select('email').eq('email', email.toLowerCase()).single();
-                    if (!data) {
-                        showMessage('Access restricted. Only @vysusgroup.com emails or pre-approved external users can sign in.', 'error');
-                        return;
-                    }
-                } catch (checkErr) {
-                    showMessage('Access restricted. Only @vysusgroup.com emails or pre-approved external users can sign in.', 'error');
-                    return;
-                }
-            }
+            const allowed = await checkEmailAllowed(email);
+            if (!allowed) return;
 
             btn.disabled = true;
             btnText.classList.add('hidden');
@@ -312,14 +378,13 @@
 
                 if (error) {
                     if (error.message.includes('Invalid login credentials')) {
-                        showMessage('Invalid email or password. If you haven\'t set a password yet, use the magic link to sign in first.', 'error');
+                        showMessage('Invalid email or password.', 'error');
                     } else {
                         showMessage(error.message, 'error');
                     }
                     return;
                 }
 
-                // Success - redirect
                 window.location.href = '/index.html';
 
             } catch (err) {
@@ -332,30 +397,69 @@
             }
         });
 
-        // Magic link (backup)
-        async function sendMagicLink() {
-            const email = document.getElementById('email').value.trim();
-            const btn = document.getElementById('magicLinkBtn');
-            const btnText = document.getElementById('magicBtnText');
-            const btnLoading = document.getElementById('magicBtnLoading');
+        // --- Sign Up ---
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
 
-            if (!email) {
-                showMessage('Please enter your email address first.', 'error');
+            const email = document.getElementById('signupEmail').value.trim();
+            const password = document.getElementById('signupPassword').value;
+            const confirm = document.getElementById('signupConfirm').value;
+            const btn = document.getElementById('signupBtn');
+            const btnText = document.getElementById('signupBtnText');
+            const btnLoading = document.getElementById('signupBtnLoading');
+
+            if (password !== confirm) {
+                showMessage('Passwords do not match.', 'error');
+                return;
+            }
+            if (password.length < 6) {
+                showMessage('Password must be at least 6 characters.', 'error');
                 return;
             }
 
             // Check if email is allowed
-            if (!email.endsWith('@vysusgroup.com')) {
-                try {
-                    const { data } = await sb.from('allowed_external_emails').select('email').eq('email', email.toLowerCase()).single();
-                    if (!data) {
-                        showMessage('Access restricted. Only @vysusgroup.com emails or pre-approved external users can sign in.', 'error');
-                        return;
-                    }
-                } catch (checkErr) {
-                    showMessage('Access restricted. Only @vysusgroup.com emails or pre-approved external users can sign in.', 'error');
+            const allowed = await checkEmailAllowed(email);
+            if (!allowed) return;
+
+            btn.disabled = true;
+            btnText.classList.add('hidden');
+            btnLoading.classList.remove('hidden');
+
+            try {
+                const { data, error } = await signUpWithPassword(email, password);
+
+                if (error) {
+                    showMessage(error.message, 'error');
                     return;
                 }
+
+                // If Supabase auto-confirms, session will be present
+                if (data.session) {
+                    window.location.href = '/index.html';
+                } else {
+                    showMessage('Account created! Check your email to confirm, then sign in.', 'success');
+                }
+
+            } catch (err) {
+                showMessage('An error occurred. Please try again.', 'error');
+                console.error(err);
+            } finally {
+                btn.disabled = false;
+                btnText.classList.remove('hidden');
+                btnLoading.classList.add('hidden');
+            }
+        });
+
+        // --- Password Reset ---
+        async function sendReset() {
+            const email = document.getElementById('resetEmail').value.trim();
+            const btn = document.getElementById('resetBtn');
+            const btnText = document.getElementById('resetBtnText');
+            const btnLoading = document.getElementById('resetBtnLoading');
+
+            if (!email) {
+                showMessage('Please enter your email address.', 'error');
+                return;
             }
 
             btn.disabled = true;
@@ -363,17 +467,14 @@
             btnLoading.classList.remove('hidden');
 
             try {
-                const { data, error } = await signInWithEmail(email);
+                const { error } = await sendPasswordReset(email);
 
                 if (error) {
                     showMessage(error.message, 'error');
                     return;
                 }
 
-                showMessage(
-                    `Magic link sent to <strong>${email}</strong>. Check your inbox and click the link to sign in.`,
-                    'success'
-                );
+                showMessage('Password reset link sent to <strong>' + email + '</strong>. Check your inbox.', 'success');
 
             } catch (err) {
                 showMessage('An error occurred. Please try again.', 'error');
@@ -385,10 +486,118 @@
             }
         }
 
+        // --- Update Password (after reset callback) ---
+        document.getElementById('updatePasswordForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const newPwd = document.getElementById('newPassword').value;
+            const confirmPwd = document.getElementById('confirmNewPassword').value;
+            const btn = document.getElementById('updateBtn');
+            const btnText = document.getElementById('updateBtnText');
+            const btnLoading = document.getElementById('updateBtnLoading');
+
+            if (newPwd !== confirmPwd) {
+                showMessage('Passwords do not match.', 'error');
+                return;
+            }
+            if (newPwd.length < 6) {
+                showMessage('Password must be at least 6 characters.', 'error');
+                return;
+            }
+
+            btn.disabled = true;
+            btnText.classList.add('hidden');
+            btnLoading.classList.remove('hidden');
+
+            try {
+                const { error } = await updatePassword(newPwd);
+
+                if (error) {
+                    showMessage(error.message, 'error');
+                    return;
+                }
+
+                showMessage('Password updated successfully! Redirecting...', 'success');
+                setTimeout(() => { window.location.href = '/index.html'; }, 1500);
+
+            } catch (err) {
+                showMessage('An error occurred. Please try again.', 'error');
+                console.error(err);
+            } finally {
+                btn.disabled = false;
+                btnText.classList.remove('hidden');
+                btnLoading.classList.add('hidden');
+            }
+        });
+
+        // --- Email whitelist check ---
+        async function checkEmailAllowed(email) {
+            if (email.endsWith('@vysusgroup.com')) return true;
+            try {
+                const { data } = await sb.from('allowed_external_emails').select('email').eq('email', email.toLowerCase()).single();
+                if (!data) {
+                    showMessage('Access restricted. Only @vysusgroup.com emails or pre-approved external users allowed.', 'error');
+                    return false;
+                }
+                return true;
+            } catch (checkErr) {
+                showMessage('Access restricted. Only @vysusgroup.com emails or pre-approved external users allowed.', 'error');
+                return false;
+            }
+        }
+
+        // --- Form visibility helpers ---
+        function showLoginForm() {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('signupForm').style.display = 'none';
+            document.getElementById('resetForm').style.display = 'none';
+            document.getElementById('updatePasswordForm').style.display = 'none';
+            document.getElementById('signupDivider').style.display = 'flex';
+            document.getElementById('signupToggle').style.display = 'block';
+            document.getElementById('footerNote').style.display = 'block';
+            document.getElementById('pageSubtitle').textContent = 'Sign in to access the pre-screening guide';
+            document.getElementById('message').className = 'message';
+        }
+
+        function showSignupForm() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('signupForm').style.display = 'block';
+            document.getElementById('resetForm').style.display = 'none';
+            document.getElementById('updatePasswordForm').style.display = 'none';
+            document.getElementById('signupDivider').style.display = 'none';
+            document.getElementById('signupToggle').style.display = 'none';
+            document.getElementById('footerNote').style.display = 'block';
+            document.getElementById('pageSubtitle').textContent = 'Create your account';
+            document.getElementById('message').className = 'message';
+        }
+
+        function showResetForm() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('signupForm').style.display = 'none';
+            document.getElementById('resetForm').style.display = 'block';
+            document.getElementById('updatePasswordForm').style.display = 'none';
+            document.getElementById('signupDivider').style.display = 'none';
+            document.getElementById('signupToggle').style.display = 'none';
+            document.getElementById('footerNote').style.display = 'none';
+            document.getElementById('pageSubtitle').textContent = 'Reset your password';
+            document.getElementById('message').className = 'message';
+        }
+
+        function showUpdatePasswordForm() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('signupForm').style.display = 'none';
+            document.getElementById('resetForm').style.display = 'none';
+            document.getElementById('updatePasswordForm').style.display = 'block';
+            document.getElementById('signupDivider').style.display = 'none';
+            document.getElementById('signupToggle').style.display = 'none';
+            document.getElementById('footerNote').style.display = 'none';
+            document.getElementById('pageSubtitle').textContent = 'Set your new password';
+        }
+
         function showMessage(text, type) {
             const message = document.getElementById('message');
             message.innerHTML = text;
-            message.className = `message ${type}`;
+            message.className = 'message ' + type;
         }
 
         // Dev mode bypass for localhost testing

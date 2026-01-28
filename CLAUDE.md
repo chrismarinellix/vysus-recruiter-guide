@@ -43,10 +43,19 @@ This is **Vysus Recruiter Guide** - a pre-screening tool for recruiters at Vysus
 | `supabase/` | Supabase config and migrations |
 
 ## Authentication
-- Supabase Auth with magic link and email/password
+- Supabase Auth with email/password signup and sign-in
+- Password reset via `sb.auth.resetPasswordForEmail()` with recovery callback on login.html
+- Email whitelist: @vysusgroup.com auto-allowed, external emails checked against `allowed_external_emails` table
 - Admin check: `session.user.email === 'chris.marinelli@vysusgroup.com'`
 - Dev session: `localStorage.getItem('vysus_dev_session')` - bypasses auth on localhost
-- Admin gear icon (&#9881;) shown only for admin email or dev sessions
+- Admin gear icon (&#9881;) shown on all pages for admin email or dev sessions
+- Auth functions in `supabase-client.js`: `signUpWithPassword()`, `sendPasswordReset()`, `updatePassword()`
+
+## Resume Assessment
+- `assessment-guide.md` - LLM assessment criteria for power systems engineer roles
+- Embedded in `analyze-resume.js` as system prompt context for Groq (llama-3.3-70b-versatile)
+- Three role levels: Senior (8 skills), Lead (9 skills), Principal (8 skills)
+- Strict scoring: strong/partial/none based on explicit resume evidence only
 
 ## Supabase Tables
 - `recruiter_profiles` - User profiles with roles

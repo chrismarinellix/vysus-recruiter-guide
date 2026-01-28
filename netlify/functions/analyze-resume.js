@@ -2,6 +2,57 @@
 
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
 
+// Assessment guide embedded for LLM context (source: assessment-guide.md)
+const ASSESSMENT_GUIDE = `
+Vysus Group provides specialist engineering consultancy for renewable energy grid connections in Australia's National Electricity Market (NEM). Engineers perform grid connection studies for solar, wind, and BESS projects, ensuring compliance with the National Electricity Rules (NER) and generator performance standards (GPS).
+
+ROLE LEVEL DEFINITIONS:
+
+SENIOR ENGINEER (Technical Delivery) — Can independently deliver R1 and R2 grid connection studies end-to-end.
+Required competencies with scoring criteria:
+1. Independent R1/R2 study delivery — Strong: led/completed R1/R2, DMAT, DMNT, grid connection studies. Partial: assisted on studies or related power systems analysis.
+2. Proficiency in PSCAD and/or PSS/E — Strong: explicitly names PSCAD or PSS/E with project context. Partial: DIgSILENT, PowerFactory, ETAP, or generic simulation.
+3. EMT & RMS simulation execution — Strong: describes running EMT or RMS simulations and interpreting results. Partial: general power systems simulation without specifying EMT/RMS.
+4. Grid code compliance assessment — Strong: references NER, S5.2, GPS, generator performance standards. Partial: general compliance or regulatory work.
+5. Model validation & tuning — Strong: validating/tuning generator or inverter models against test data. Partial: general model development or testing.
+6. Technical report writing — Strong: writing study reports, technical documentation. Partial: general engineering report writing.
+7. Client communication — Strong: presenting to or communicating with clients/stakeholders. Partial: general communication skills.
+8. Team knowledge contribution — Strong: mentoring juniors, knowledge sharing, training activities. Partial: general teamwork.
+
+LEAD ENGINEER (Technical Leadership) — All Senior competencies PLUS leads projects and develops people.
+Additional competencies:
+1. Mentors and develops engineers — Strong: explicitly describes mentoring, coaching, developing team. Partial: working with junior staff.
+2. Project leadership & oversight — Strong: named as project lead/manager with deliverable accountability. Partial: general team lead or coordination.
+3. Direct NSP/AEMO engagement — Strong: names specific NSPs (Transgrid, Powerlink, ElectraNet, AusNet) or AEMO. Partial: general utility or regulator engagement.
+4. Project budget management — Strong: managing budgets, cost control, financial forecasting. Partial: commercial awareness.
+5. Client relationship ownership — Strong: primary client contact, account management. Partial: regular client interaction.
+6. Technical review & QA sign-off — Strong: reviews and approves others' technical work. Partial: participates in peer review.
+7. Scope definition & proposal input — Strong: writes proposals, tenders, scope documents. Partial: aware of proposal processes.
+8. Multi-project coordination — Strong: manages multiple concurrent projects. Partial: works on multiple projects.
+9. Technical risk assessment — Strong: identifies and manages technical risks. Partial: general risk awareness.
+
+PRINCIPAL ENGINEER (Strategic Leadership) — All Lead competencies PLUS strategic oversight and business growth.
+Additional competencies:
+1. Strategic oversight across projects — Strong: portfolio/program management, strategic direction. Partial: large project oversight.
+2. Business development & growth — Strong: wins new work, client pipeline, revenue targets. Partial: supports BD activities.
+3. Senior client advisory — Strong: strategic guidance to senior stakeholders. Partial: project-level advisory.
+4. Team capacity & capability planning — Strong: plans team growth, capability gaps, recruitment. Partial: identifies skills needs.
+5. Guides Leads on complex decisions — Strong: technical direction to other leads/seniors. Partial: independent complex decisions.
+6. Industry thought leadership — Strong: conference presentations, publications, working groups. Partial: industry awareness.
+7. Proposal strategy & pricing oversight — Strong: win strategy, pricing decisions. Partial: proposal contribution.
+8. Market positioning & service offering — Strong: shapes service offerings, market opportunities. Partial: market understanding.
+
+SCORING RULES:
+- "strong": Resume explicitly demonstrates the competency with specific examples, project names, tools named, or outcomes.
+- "partial": Related experience that suggests capability but does not directly confirm the exact competency.
+- "none": No evidence in resume. Do NOT infer or assume. When in doubt, mark "none".
+- Role score (0-100) = percentage of competencies at strong/partial. Weight "strong" more than "partial".
+- Level recommendation: Senior needs majority of Senior skills (especially items 1-5). Lead needs Senior PLUS leadership skills. Principal needs Lead PLUS strategic/BD skills. Below Senior = no simulation tool or grid connection study experience.
+- Power systems experience in non-renewable sectors is "partial" for renewable-specific competencies.
+- International (non-Australian NEM) experience is valid but NER/AEMO/NSP knowledge may need development.
+- Software tool proficiency must be explicitly named — do not assume from general simulation experience.
+`;
+
 exports.handler = async (event, context) => {
   // CORS headers
   const headers = {
@@ -58,7 +109,7 @@ exports.handler = async (event, context) => {
         messages: [
           {
             role: 'system',
-            content: `You are an expert technical recruiter specializing in power systems engineering for the renewable energy sector. You analyze resumes against specific role requirements and provide detailed skill matching analysis. Always respond with valid JSON.`
+            content: `You are an expert technical recruiter specializing in power systems engineering for the renewable energy sector at Vysus Group. You analyze resumes against specific role requirements and provide detailed, consistent skill matching analysis. You must strictly follow the assessment guide provided and never infer skills not explicitly stated in the resume. Always respond with valid JSON.\n\nASSESSMENT GUIDE:\n${ASSESSMENT_GUIDE}`
           },
           {
             role: 'user',
@@ -125,7 +176,7 @@ function buildAnalysisPrompt(resumeText, candidateName, targetPosition, roleRequ
     'strategic oversight, business development, senior advisory, capacity planning, industry thought leadership';
 
   return `
-Analyze this resume for a ${targetPosition} Engineer position at Vysus Group, a power systems engineering consultancy specializing in renewable energy grid connections in Australia.
+Analyze this resume against Vysus Group's power systems engineer role requirements. Use the Assessment Guide provided in the system message for scoring criteria and competency definitions.
 
 CANDIDATE: ${candidateName || 'Unknown'}
 TARGET POSITION: ${targetPosition} Engineer
@@ -133,57 +184,60 @@ TARGET POSITION: ${targetPosition} Engineer
 RESUME CONTENT:
 ${resumeText.substring(0, 8000)}
 
-ROLE REQUIREMENTS:
+SKILL NAMES FOR EACH ROLE (match skills array to these in order):
 
-SENIOR ENGINEER (Technical Delivery):
+SENIOR ENGINEER (8 skills):
 ${seniorSkills}
 
-LEAD ENGINEER (Technical Leadership):
-All Senior requirements plus: ${leadSkills}
+LEAD ENGINEER (9 additional skills beyond Senior):
+${leadSkills}
 
-PRINCIPAL ENGINEER (Strategic Leadership):
-All Lead requirements plus: ${principalSkills}
+PRINCIPAL ENGINEER (8 additional skills beyond Lead):
+${principalSkills}
 
 KEY TECHNICAL KEYWORDS TO LOOK FOR:
-- Software: PSCAD, PSS/E, PSSE, DIgSILENT, PowerFactory, ETAP, Python
-- Studies: R1, R2, DMAT, DMNT, grid connection studies, compliance
-- Technical: EMT, RMS, GFL, GFM, LVRT, HVRT, SCR, PPC, inverter, fault ride through
-- Regulatory: NER, AEMO, NSP, GPS, S5.2, grid code
-- Projects: solar, wind, BESS, battery, renewable, MW
+- Software: PSCAD, PSS/E, PSSE, DIgSILENT, PowerFactory, ETAP, Python, MATLAB
+- Studies: R1, R2, DMAT, DMNT, grid connection studies, compliance, system strength
+- Technical: EMT, RMS, GFL, GFM, LVRT, HVRT, SCR, PPC, inverter, fault ride through, harmonics, SSO
+- Regulatory: NER, AEMO, NSP, GPS, S5.2, grid code, connection agreement
+- Projects: solar, wind, BESS, battery, renewable, MW, hybrid
+- Australian NSPs: Transgrid, Powerlink, ElectraNet, AusNet, Western Power, TasNetworks
 
-Analyze the resume and return a JSON object with this exact structure:
+Return a JSON object with this exact structure:
 {
-  "extractedName": "<full name of the candidate as it appears on the resume>",
-  "extractedEmail": "<email address found on the resume, or null if not found>",
+  "extractedName": "<full name from resume>",
+  "extractedEmail": "<email from resume, or null>",
   "overallScore": <number 0-100>,
   "recommendedLevel": "<Senior|Lead|Principal|Below Senior>",
-  "summary": "<2-3 sentence summary of candidate's fit>",
+  "summary": "<2-3 sentence summary of candidate's fit for Vysus, referencing specific evidence from the resume>",
   "roleMatches": {
     "senior": {
       "score": <number 0-100>,
-      "skills": ["strong", "partial", "none", ...] // one for each senior skill in order
+      "skills": ["strong"|"partial"|"none", ...] // exactly 8 values, one per Senior skill in order
     },
     "lead": {
       "score": <number 0-100>,
-      "skills": ["strong", "partial", "none", ...] // one for each lead skill in order
+      "skills": ["strong"|"partial"|"none", ...] // exactly 9 values, one per Lead skill in order
     },
     "principal": {
       "score": <number 0-100>,
-      "skills": ["strong", "partial", "none", ...] // one for each principal skill in order
+      "skills": ["strong"|"partial"|"none", ...] // exactly 8 values, one per Principal skill in order
     }
   },
-  "recommendation": "<one line recommendation>",
-  "keyStrengths": ["<strength 1>", "<strength 2>", ...],
-  "gaps": ["<gap 1>", "<gap 2>", ...]
+  "recommendation": "<one line hiring recommendation>",
+  "keyStrengths": ["<specific strength with evidence from resume>", ...],
+  "gaps": ["<specific gap relevant to target position>", ...]
 }
 
 CRITICAL RULES:
-- ONLY base your analysis on information explicitly stated in the resume text above.
-- Do NOT infer, assume, or fabricate skills, experience, or qualifications not clearly mentioned in the resume.
-- If a skill or keyword is not found in the resume, mark it as "none".
-- Only mark a skill as "partial" if there is indirect evidence in the resume (e.g., related but not exact experience).
-- Only mark a skill as "strong" if the resume explicitly demonstrates that capability.
-- Be honest and accurate. When in doubt, mark as "none" rather than guessing.
+- Follow the Assessment Guide scoring criteria strictly for strong/partial/none decisions.
+- ONLY base analysis on information explicitly stated in the resume text.
+- Do NOT infer, assume, or fabricate skills not clearly mentioned.
+- Senior skills array must have exactly 8 entries, Lead exactly 9, Principal exactly 8.
+- When in doubt between partial and none, mark "none".
+- Reference specific resume content in the summary and strengths.
+- International experience is valid but note if Australian NEM knowledge may need development.
+- Software tools must be explicitly named — do not assume from general descriptions.
 `;
 }
 

@@ -33,12 +33,27 @@ function initSupabase() {
 }
 
 // Auth functions
-async function signInWithEmail(email) {
-  const { data, error } = await sb.auth.signInWithOtp({
+async function signUpWithPassword(email, password) {
+  const { data, error } = await sb.auth.signUp({
     email: email,
+    password: password,
     options: {
-      emailRedirectTo: window.location.origin + '/index.html'
+      emailRedirectTo: window.location.origin + '/login.html'
     }
+  });
+  return { data, error };
+}
+
+async function sendPasswordReset(email) {
+  const { data, error } = await sb.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + '/login.html'
+  });
+  return { data, error };
+}
+
+async function updatePassword(newPassword) {
+  const { data, error } = await sb.auth.updateUser({
+    password: newPassword
   });
   return { data, error };
 }
@@ -272,7 +287,9 @@ async function getAllUsers() {
 // Export for use in HTML
 if (typeof window !== 'undefined') {
   window.initSupabase = initSupabase;
-  window.signInWithEmail = signInWithEmail;
+  window.signUpWithPassword = signUpWithPassword;
+  window.sendPasswordReset = sendPasswordReset;
+  window.updatePassword = updatePassword;
   window.signOut = signOut;
   window.getSession = getSession;
   window.getUser = getUser;
