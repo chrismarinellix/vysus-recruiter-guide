@@ -745,7 +745,7 @@
                 const analysis = await response.json();
 
                 // Save to database
-                await saveResumeAnalysis({
+                const { data: savedAnalysis } = await saveResumeAnalysis({
                     candidate_name: candidateName,
                     candidate_email: candidateEmail,
                     resume_path: filePath,
@@ -756,11 +756,22 @@
                     recommendation: analysis.recommendation
                 });
 
+                // Add candidate to candidates list
+                const { data: candidateData, isNew } = await addCandidateFromResume(
+                    candidateName,
+                    candidateEmail,
+                    targetPosition,
+                    savedAnalysis?.id,
+                    analysis.overallScore
+                );
+                console.log(isNew ? 'New candidate added' : 'Existing candidate updated', candidateData);
+
                 // Log activity
                 await logActivity('analyze_resume', {
                     candidate: candidateName,
                     position: targetPosition,
-                    score: analysis.overallScore
+                    score: analysis.overallScore,
+                    candidateAdded: isNew
                 });
 
                 // Display results

@@ -247,6 +247,49 @@ async function checkInterviewedCandidate(candidateName) {
   return { matches: data || [], error };
 }
 
+// Add or update candidate from resume analysis
+async function addCandidateFromResume(candidateName, candidateEmail, targetPosition, analysisId, analysisScore) {
+  // First check if candidate exists
+  const { matches } = await checkInterviewedCandidate(candidateName);
+  const existingCandidate = matches.find(m => m.name.toLowerCase() === candidateName.toLowerCase());
+
+  if (existingCandidate) {
+    // Update existing candidate with new analysis
+    const { data, error } = await sb
+      .from('interviewed_candidates')
+      .update({
+        email: candidateEmail || existingCandidate.email,
+        resume_analysis_id: analysisId,
+        analysis_score: analysisScore,
+        target_position: targetPosition,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', existingCandidate.id)
+      .select()
+      .single();
+    return { data, error, isNew: false };
+  } else {
+    // Insert new candidate
+    const { data, error } = await sb
+      .from('interviewed_candidates')
+      .insert({
+        name: candidateName,
+        email: candidateEmail || null,
+        status: 'Potential',
+        source: 'resume_upload',
+        level: targetPosition,
+        target_position: targetPosition,
+        resume_analysis_id: analysisId,
+        analysis_score: analysisScore,
+        last_contacted: new Date().toISOString().split('T')[0],
+        months_ago: 0
+      })
+      .select()
+      .single();
+    return { data, error, isNew: true };
+  }
+}
+
 // File upload functions
 async function uploadResume(file, candidateName) {
   const timestamp = Date.now();
@@ -310,4 +353,5 @@ if (typeof window !== 'undefined') {
   window.getAllUsers = getAllUsers;
   window.saveScreeningResult = saveScreeningResult;
   window.checkInterviewedCandidate = checkInterviewedCandidate;
+  window.addCandidateFromResume = addCandidateFromResume;
 }

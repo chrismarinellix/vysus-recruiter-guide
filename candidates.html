@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interviewed Candidates | Vysus Recruiter Guide</title>
+    <title>Candidates | Vysus Recruiter Guide</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
@@ -124,6 +124,7 @@
         }
 
         .stat-card.total { border-left-color: var(--vysus-malmo-green); }
+        .stat-card.potential { border-left-color: #17a2b8; }
         .stat-card.declined { border-left-color: #dc3545; }
         .stat-card.not-progressed { border-left-color: #6c757d; }
         .stat-card.withdrew { border-left-color: #ffc107; }
@@ -269,6 +270,21 @@
             color: var(--vysus-malmo-green);
         }
 
+        .status-badge.potential {
+            background: rgba(23, 162, 184, 0.15);
+            color: #117a8b;
+        }
+
+        .status-badge.screening {
+            background: rgba(0, 123, 255, 0.15);
+            color: #0056b3;
+        }
+
+        .status-badge.interview-scheduled {
+            background: rgba(40, 167, 69, 0.15);
+            color: #1e7e34;
+        }
+
         /* Level badges */
         .level-badge {
             display: inline-block;
@@ -343,7 +359,7 @@
                 </svg>
                 <span class="logo-text">VYSUS GROUP</span>
             </div>
-            <h1>Interviewed Candidates</h1>
+            <h1>Potential / Interviewed Candidates</h1>
             <div class="nav-links">
                 <a href="/index.html">Screening Guide</a>
                 <a href="/resume-analyzer.html">Resume Analyzer</a>
@@ -358,19 +374,19 @@
         <div class="stats-grid" id="statsGrid">
             <div class="stat-card total">
                 <div class="stat-value" id="totalCount">-</div>
-                <div class="stat-label">Total Candidates</div>
+                <div class="stat-label">Total</div>
+            </div>
+            <div class="stat-card potential">
+                <div class="stat-value" id="potentialCount">-</div>
+                <div class="stat-label">Potential</div>
             </div>
             <div class="stat-card declined">
                 <div class="stat-value" id="declinedCount">-</div>
-                <div class="stat-label">Declined Offer</div>
+                <div class="stat-label">Declined</div>
             </div>
             <div class="stat-card not-progressed">
                 <div class="stat-value" id="notProgressedCount">-</div>
                 <div class="stat-label">Not Progressed</div>
-            </div>
-            <div class="stat-card withdrew">
-                <div class="stat-value" id="withdrewCount">-</div>
-                <div class="stat-label">Withdrew</div>
             </div>
             <div class="stat-card may-revisit">
                 <div class="stat-value" id="mayRevisitCount">-</div>
@@ -388,6 +404,9 @@
                 <label>Status</label>
                 <select id="statusFilter">
                     <option value="">All Statuses</option>
+                    <option value="Potential">Potential</option>
+                    <option value="Screening">Screening</option>
+                    <option value="Interview Scheduled">Interview Scheduled</option>
                     <option value="Declined Offer">Declined Offer</option>
                     <option value="Not Progressed">Not Progressed</option>
                     <option value="Withdrew">Withdrew</option>
@@ -499,16 +518,16 @@
         function updateStats() {
             const stats = {
                 total: allCandidates.length,
+                potential: allCandidates.filter(c => c.status === 'Potential' || c.status === 'Screening' || c.status === 'Interview Scheduled').length,
                 declined: allCandidates.filter(c => c.status === 'Declined Offer').length,
                 notProgressed: allCandidates.filter(c => c.status === 'Not Progressed').length,
-                withdrew: allCandidates.filter(c => c.status === 'Withdrew').length,
                 mayRevisit: allCandidates.filter(c => c.status === 'May Revisit').length
             };
 
             document.getElementById('totalCount').textContent = stats.total;
+            document.getElementById('potentialCount').textContent = stats.potential;
             document.getElementById('declinedCount').textContent = stats.declined;
             document.getElementById('notProgressedCount').textContent = stats.notProgressed;
-            document.getElementById('withdrewCount').textContent = stats.withdrew;
             document.getElementById('mayRevisitCount').textContent = stats.mayRevisit;
         }
 
