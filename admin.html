@@ -200,9 +200,13 @@
             <button class="tab" onclick="showTab('screenings', this)">All Screenings</button>
             <button class="tab" onclick="showTab('analyses', this)">All Analyses</button>
             <button class="tab" onclick="showTab('manageUsers', this)">Manage External Users</button>
+            <button class="tab" onclick="showTab('debug', this)" style="margin-left: auto; color: #ffc107;">Debug Logs</button>
         </div>
         <div class="panel" id="panel">
             <div class="loading">Loading...</div>
+        </div>
+        <div class="panel" id="debugPanel" style="display: none; background: var(--vysus-trondheim-night); color: var(--vysus-white); padding: 16px; font-family: monospace; font-size: 11px; max-height: 400px; overflow-y: auto;">
+            <div style="opacity: 0.5;">Debug logs will appear here...</div>
         </div>
     </div>
 
@@ -210,12 +214,35 @@
 
     <script src="js/supabase-client.js"></script>
     <script>
+        // Debug logging helper
+        const debugLogs = [];
+        function debugLog(category, message, data = null) {
+            const timestamp = new Date().toISOString().split('T')[1].split('.')[0];
+            const entry = { timestamp, category, message, data };
+            debugLogs.push(entry);
+            console.log(`[${timestamp}] [${category}] ${message}`, data || '');
+            updateDebugPanel();
+        }
+
+        function updateDebugPanel() {
+            const panel = document.getElementById('debugPanel');
+            if (!panel) return;
+            const html = debugLogs.slice(-20).reverse().map(e => {
+                const dataStr = e.data ? ` <span style="opacity:0.6">${JSON.stringify(e.data).substring(0, 100)}</span>` : '';
+                return `<div style="margin-bottom: 4px;"><span style="color: var(--vysus-stockholm-neon);">[${e.timestamp}]</span> <span style="color: #ffc107;">[${e.category}]</span> ${e.message}${dataStr}</div>`;
+            }).join('');
+            panel.innerHTML = html || '<div style="opacity: 0.5;">No logs yet</div>';
+        }
+
         document.addEventListener('DOMContentLoaded', async () => {
+            debugLog('INIT', 'Page loaded, initializing Supabase...');
             initSupabase();
+            debugLog('INIT', 'Supabase client initialized');
 
             // Dev session check
             const devSession = localStorage.getItem('vysus_dev_session');
             if (devSession) {
+                debugLog('AUTH', 'Dev session detected', JSON.parse(devSession));
                 document.getElementById('adminEmail').textContent = JSON.parse(devSession).email + ' (DEV)';
                 document.getElementById('adminContainer').classList.add('visible');
                 loadActivity();
@@ -223,8 +250,15 @@
             }
 
             // Auth check
-            const { session } = await getSession();
+            debugLog('AUTH', 'Checking session...');
+            const { session, error: sessionError } = await getSession();
+            if (sessionError) {
+                debugLog('AUTH', 'Session error', sessionError);
+            }
+            debugLog('AUTH', 'Session result', { hasSession: !!session, email: session?.user?.email });
+
             if (!session || session.user.email !== 'chris.marinelli@vysusgroup.com') {
+                debugLog('AUTH', 'Access denied - not admin email');
                 document.getElementById('denied').style.display = 'block';
                 return;
             }
@@ -234,30 +268,54 @@
 
             // Debug: Check admin profile status
             try {
-                const { user } = await getUser();
+                debugLog('PROFILE', 'Fetching user...');
+                const { user, error: userError } = await getUser();
+                if (userError) {
+                    debugLog('PROFILE', 'getUser error', userError);
+                }
+                debugLog('PROFILE', 'User fetched', { id: user?.id, email: user?.email });
+
+                debugLog('PROFILE', 'Fetching profile for user ID: ' + user.id);
                 const { data: profile, error: profileError } = await getProfile(user.id);
+                debugLog('PROFILE', 'Profile result', { profile, error: profileError?.message });
+
                 const debugEl = document.createElement('div');
                 debugEl.id = 'debugBanner';
                 debugEl.style.cssText = 'padding: 12px 20px; margin-bottom: 16px; font-size: 12px; font-family: monospace; border-left: 4px solid;';
                 if (profileError) {
                     debugEl.style.background = 'rgba(249, 45, 99, 0.1)';
                     debugEl.style.borderLeftColor = '#F92D63';
-                    debugEl.textContent = 'Profile error: ' + profileError.message + ' | User ID: ' + user.id;
+                    debugEl.innerHTML = '<strong>Profile error:</strong> ' + profileError.message + '<br><strong>User ID:</strong> ' + user.id + '<br><strong>Fix:</strong> Run <code>supabase/fix-rls-recursion.sql</code> in Supabase SQL Editor';
                 } else if (!profile) {
                     debugEl.style.background = 'rgba(249, 45, 99, 0.1)';
                     debugEl.style.borderLeftColor = '#F92D63';
-                    debugEl.textContent = 'No profile row found for ' + user.email + ' (ID: ' + user.id + '). RLS will block admin queries. Run SQL: INSERT INTO recruiter_profiles (id, email, role) SELECT id, email, \'admin\' FROM auth.users WHERE email = \'' + user.email + '\' ON CONFLICT (id) DO UPDATE SET role = \'admin\';';
+                    debugEl.innerHTML = '<strong>No profile row found</strong> for ' + user.email + '<br><strong>User ID:</strong> ' + user.id + '<br><strong>Fix:</strong> Run <code>supabase/fix-rls-recursion.sql</code> in Supabase SQL Editor';
                 } else if (profile.role !== 'admin') {
                     debugEl.style.background = 'rgba(255, 193, 7, 0.2)';
                     debugEl.style.borderLeftColor = '#ffc107';
-                    debugEl.textContent = 'Profile exists but role = "' + profile.role + '" (not admin). ID: ' + user.id + '. Run SQL: UPDATE recruiter_profiles SET role = \'admin\' WHERE id = \'' + user.id + '\';';
+                    debugEl.innerHTML = '<strong>Profile exists but role = "' + profile.role + '"</strong> (not admin)<br><strong>User ID:</strong> ' + user.id + '<br><strong>Fix:</strong> UPDATE recruiter_profiles SET role = \'admin\' WHERE id = \'' + user.id + '\';';
                 } else {
                     debugEl.style.background = 'rgba(0, 227, 169, 0.1)';
                     debugEl.style.borderLeftColor = 'var(--vysus-stockholm-neon)';
-                    debugEl.textContent = 'Admin profile verified. Role: ' + profile.role + ' | ID: ' + user.id;
+                    debugEl.innerHTML = '<strong>Admin verified</strong> | Role: ' + profile.role + ' | ID: ' + user.id + ' | Last login: ' + (profile.last_login || 'Never');
                 }
                 document.getElementById('adminContainer').prepend(debugEl);
+
+                // Update last login
+                debugLog('PROFILE', 'Updating last login...');
+                const { error: loginUpdateError } = await updateLastLogin(user.id);
+                if (loginUpdateError) {
+                    debugLog('PROFILE', 'Failed to update last login', loginUpdateError);
+                } else {
+                    debugLog('PROFILE', 'Last login updated');
+                }
+
+                // Log this admin access
+                debugLog('ACTIVITY', 'Logging admin access...');
+                await logActivity('admin_access', { page: 'admin.html' });
+
             } catch (debugErr) {
+                debugLog('ERROR', 'Debug profile check failed', debugErr.message);
                 console.error('[Admin] Debug profile check failed:', debugErr);
             }
 
@@ -267,22 +325,36 @@
         function showTab(tab, btn) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             btn.classList.add('active');
+            document.getElementById('panel').style.display = tab === 'debug' ? 'none' : 'block';
+            document.getElementById('debugPanel').style.display = tab === 'debug' ? 'block' : 'none';
             if (tab === 'activity') loadActivity();
             else if (tab === 'logins') loadLogins();
             else if (tab === 'screenings') loadScreenings();
             else if (tab === 'analyses') loadAnalyses();
             else if (tab === 'manageUsers') loadManageUsers();
+            else if (tab === 'debug') updateDebugPanel();
         }
 
         async function loadActivity() {
             const panel = document.getElementById('panel');
-            panel.innerHTML = '<div class="loading">Loading...</div>';
+            panel.innerHTML = '<div class="loading">Loading activity...</div>';
+            debugLog('QUERY', 'Loading activity_log (limit 200)...');
             try {
                 const { data, error } = await getActivityLog(200);
-                if (error) { console.error('[Admin] activity_log query error:', error); throw error; }
-                if (!data || data.length === 0) { console.warn('[Admin] activity_log returned empty — RLS may be blocking'); panel.innerHTML = '<div class="empty">No activity recorded yet.</div>'; return; }
+                if (error) {
+                    debugLog('QUERY', 'activity_log ERROR', { code: error.code, message: error.message, hint: error.hint });
+                    throw error;
+                }
+                debugLog('QUERY', 'activity_log result', { rows: data?.length || 0 });
 
-                let html = '<table><thead><tr><th>Time</th><th>User</th><th>Action</th><th>Details</th></tr></thead><tbody>';
+                if (!data || data.length === 0) {
+                    debugLog('QUERY', 'activity_log returned empty - RLS may be blocking or no data');
+                    panel.innerHTML = '<div class="empty">No activity recorded yet. <br><span style="font-size: 11px; opacity: 0.6;">If you expect data, check Debug Logs tab for RLS issues.</span></div>';
+                    return;
+                }
+
+                let html = '<p class="info">Showing ' + data.length + ' recent activity entries</p>';
+                html += '<table><thead><tr><th>Time</th><th>User</th><th>Action</th><th>Details</th></tr></thead><tbody>';
                 data.forEach(row => {
                     const time = new Date(row.created_at).toLocaleString('en-AU', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
                     const details = row.details ? Object.entries(row.details).map(([k,v]) => `${k}: ${v}`).join(', ') : '';
@@ -291,41 +363,71 @@
                 html += '</tbody></table>';
                 panel.innerHTML = html;
             } catch (err) {
-                panel.innerHTML = '<div class="empty" style="color:#F92D63;">Error loading activity: ' + (err.message || err) + '</div>';
+                debugLog('ERROR', 'loadActivity failed', err.message);
+                panel.innerHTML = '<div class="empty" style="color:#F92D63;">Error loading activity: ' + (err.message || err) + '<br><span style="font-size: 11px;">Check Debug Logs for details. If "infinite recursion" error, run supabase/fix-rls-recursion.sql</span></div>';
             }
         }
 
         async function loadLogins() {
             const panel = document.getElementById('panel');
-            panel.innerHTML = '<div class="loading">Loading...</div>';
+            panel.innerHTML = '<div class="loading">Loading user logins...</div>';
+            debugLog('QUERY', 'Loading recruiter_profiles...');
             try {
-                const { data, error } = await sb.from('recruiter_profiles').select('*').order('last_login', { ascending: false });
-                if (error) { console.error('[Admin] recruiter_profiles query error:', error); throw error; }
-                if (!data || data.length === 0) { console.warn('[Admin] recruiter_profiles returned empty — RLS may be blocking'); panel.innerHTML = '<div class="empty">No users found.</div>'; return; }
+                const { data, error } = await sb.from('recruiter_profiles').select('*').order('last_login', { ascending: false, nullsFirst: false });
+                if (error) {
+                    debugLog('QUERY', 'recruiter_profiles ERROR', { code: error.code, message: error.message, hint: error.hint });
+                    throw error;
+                }
+                debugLog('QUERY', 'recruiter_profiles result', { rows: data?.length || 0 });
 
-                let html = '<table><thead><tr><th>Email</th><th>Name</th><th>Role</th><th>Last Login</th><th>Registered</th></tr></thead><tbody>';
+                if (!data || data.length === 0) {
+                    debugLog('QUERY', 'recruiter_profiles returned empty - RLS blocking or no users');
+                    panel.innerHTML = '<div class="empty">No users found. <br><span style="font-size: 11px; opacity: 0.6;">RLS may be blocking. Check Debug Logs tab.</span></div>';
+                    return;
+                }
+
+                // Summary stats
+                const admins = data.filter(u => u.role === 'admin').length;
+                const recentLogins = data.filter(u => u.last_login && new Date(u.last_login) > new Date(Date.now() - 7*24*60*60*1000)).length;
+
+                let html = '<p class="info">' + data.length + ' users total | ' + admins + ' admin(s) | ' + recentLogins + ' logged in last 7 days</p>';
+                html += '<table><thead><tr><th>Email</th><th>Name</th><th>Role</th><th>Last Login</th><th>Registered</th><th>Login Count</th></tr></thead><tbody>';
                 data.forEach(row => {
-                    const lastLogin = row.last_login ? new Date(row.last_login).toLocaleString('en-AU', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Never';
+                    const lastLogin = row.last_login ? new Date(row.last_login).toLocaleString('en-AU', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '<span style="opacity:0.5;">Never</span>';
                     const registered = new Date(row.created_at).toLocaleString('en-AU', { day: '2-digit', month: 'short', year: 'numeric' });
                     const badge = row.role === 'admin' ? '<span class="badge badge-admin">admin</span>' : '<span class="badge badge-recruiter">recruiter</span>';
-                    html += `<tr><td>${row.email}</td><td>${row.full_name || '-'}</td><td>${badge}</td><td>${lastLogin}</td><td>${registered}</td></tr>`;
+                    const isRecent = row.last_login && new Date(row.last_login) > new Date(Date.now() - 24*60*60*1000);
+                    const rowStyle = isRecent ? 'background: rgba(0, 227, 169, 0.05);' : '';
+                    html += `<tr style="${rowStyle}"><td>${row.email}</td><td>${row.full_name || '-'}</td><td>${badge}</td><td>${lastLogin}</td><td>${registered}</td><td style="text-align:center;">${row.login_count || '-'}</td></tr>`;
                 });
                 html += '</tbody></table>';
                 panel.innerHTML = html;
             } catch (err) {
-                panel.innerHTML = '<div class="empty" style="color:#F92D63;">Error loading users: ' + (err.message || err) + '</div>';
+                debugLog('ERROR', 'loadLogins failed', err.message);
+                panel.innerHTML = '<div class="empty" style="color:#F92D63;">Error loading users: ' + (err.message || err) + '<br><span style="font-size: 11px;">If "infinite recursion" error, run supabase/fix-rls-recursion.sql</span></div>';
             }
         }
 
         async function loadScreenings() {
             const panel = document.getElementById('panel');
-            panel.innerHTML = '<div class="loading">Loading...</div>';
+            panel.innerHTML = '<div class="loading">Loading screenings...</div>';
+            debugLog('QUERY', 'Loading screening_results (limit 100)...');
             try {
                 const { data, error } = await sb.from('screening_results').select('*').order('created_at', { ascending: false }).limit(100);
-                if (error) { console.error('[Admin] screening_results query error:', error); throw error; }
-                if (!data || data.length === 0) { console.warn('[Admin] screening_results returned empty — RLS may be blocking'); panel.innerHTML = '<div class="empty">No screening results yet.</div>'; return; }
+                if (error) {
+                    debugLog('QUERY', 'screening_results ERROR', { code: error.code, message: error.message });
+                    throw error;
+                }
+                debugLog('QUERY', 'screening_results result', { rows: data?.length || 0 });
 
-                let html = '<table><thead><tr><th>Date</th><th>Screened By</th><th>Candidate</th><th>Score</th><th>Result</th><th>Level</th><th>Prev. Interviewed</th></tr></thead><tbody>';
+                if (!data || data.length === 0) {
+                    panel.innerHTML = '<div class="empty">No screening results yet.</div>';
+                    return;
+                }
+
+                const passCount = data.filter(r => (r.pass_fail || '').includes('PASS')).length;
+                let html = '<p class="info">' + data.length + ' screenings | ' + passCount + ' passed (' + Math.round(passCount/data.length*100) + '%)</p>';
+                html += '<table><thead><tr><th>Date</th><th>Screened By</th><th>Candidate</th><th>Score</th><th>Result</th><th>Level</th><th>Prev. Interviewed</th></tr></thead><tbody>';
                 data.forEach(row => {
                     const time = new Date(row.created_at).toLocaleString('en-AU', { day: '2-digit', month: 'short', year: 'numeric' });
                     const passBadge = (row.pass_fail || '').includes('PASS') ? '<span class="badge badge-pass">' + row.pass_fail + '</span>' : '<span class="badge badge-fail">' + (row.pass_fail || '-') + '</span>';
@@ -335,36 +437,54 @@
                 html += '</tbody></table>';
                 panel.innerHTML = html;
             } catch (err) {
+                debugLog('ERROR', 'loadScreenings failed', err.message);
                 panel.innerHTML = '<div class="empty" style="color:#F92D63;">Error loading screenings: ' + (err.message || err) + '</div>';
             }
         }
 
         async function loadAnalyses() {
             const panel = document.getElementById('panel');
-            panel.innerHTML = '<div class="loading">Loading...</div>';
+            panel.innerHTML = '<div class="loading">Loading analyses...</div>';
+            debugLog('QUERY', 'Loading resume_analyses (limit 100)...');
             try {
                 const { data, error } = await getResumeAnalyses(100);
-                if (error) { console.error('[Admin] resume_analyses query error:', error); throw error; }
-                if (!data || data.length === 0) { console.warn('[Admin] resume_analyses returned empty — RLS may be blocking'); panel.innerHTML = '<div class="empty">No resume analyses yet.</div>'; return; }
+                if (error) {
+                    debugLog('QUERY', 'resume_analyses ERROR', { code: error.code, message: error.message });
+                    throw error;
+                }
+                debugLog('QUERY', 'resume_analyses result', { rows: data?.length || 0 });
 
-                let html = '<table><thead><tr><th>Date</th><th>Candidate</th><th>Email</th><th>Position</th><th>Score</th><th>Recommendation</th></tr></thead><tbody>';
+                if (!data || data.length === 0) {
+                    panel.innerHTML = '<div class="empty">No resume analyses yet.</div>';
+                    return;
+                }
+
+                let html = '<p class="info">' + data.length + ' resume analyses</p>';
+                html += '<table><thead><tr><th>Date</th><th>Candidate</th><th>Email</th><th>Position</th><th>Score</th><th>Recommendation</th></tr></thead><tbody>';
                 data.forEach(row => {
                     const time = new Date(row.created_at).toLocaleString('en-AU', { day: '2-digit', month: 'short', year: 'numeric' });
-                    html += `<tr><td>${time}</td><td>${row.candidate_name}</td><td>${row.candidate_email || '-'}</td><td>${row.target_position || '-'}</td><td>${row.overall_score || '-'}%</td><td>${row.recommendation || '-'}</td></tr>`;
+                    const scoreColor = (row.overall_score || 0) >= 70 ? 'var(--vysus-stockholm-neon)' : (row.overall_score || 0) >= 50 ? '#ffc107' : '#F92D63';
+                    html += `<tr><td>${time}</td><td>${row.candidate_name}</td><td>${row.candidate_email || '-'}</td><td>${row.target_position || '-'}</td><td style="color: ${scoreColor}; font-weight: 500;">${row.overall_score || '-'}%</td><td>${row.recommendation || '-'}</td></tr>`;
                 });
                 html += '</tbody></table>';
                 panel.innerHTML = html;
             } catch (err) {
+                debugLog('ERROR', 'loadAnalyses failed', err.message);
                 panel.innerHTML = '<div class="empty" style="color:#F92D63;">Error loading analyses: ' + (err.message || err) + '</div>';
             }
         }
 
         async function loadManageUsers() {
             const panel = document.getElementById('panel');
-            panel.innerHTML = '<div class="loading">Loading...</div>';
+            panel.innerHTML = '<div class="loading">Loading external users...</div>';
+            debugLog('QUERY', 'Loading allowed_external_emails...');
             try {
                 const { data, error } = await sb.from('allowed_external_emails').select('*').order('created_at', { ascending: false });
-                if (error) { console.error('[Admin] allowed_external_emails query error:', error); throw error; }
+                if (error) {
+                    debugLog('QUERY', 'allowed_external_emails ERROR', { code: error.code, message: error.message });
+                    throw error;
+                }
+                debugLog('QUERY', 'allowed_external_emails result', { rows: data?.length || 0 });
 
                 let html = '<p class="info">All @vysusgroup.com emails can self-register. External users must be added here before they can sign up or log in.</p>';
                 html += '<div class="add-form">';
@@ -385,6 +505,7 @@
                 }
                 panel.innerHTML = html;
             } catch (err) {
+                debugLog('ERROR', 'loadManageUsers failed', err.message);
                 panel.innerHTML = '<div class="empty" style="color:#F92D63;">Error loading external users: ' + (err.message || err) + '</div>';
             }
         }
@@ -394,9 +515,14 @@
             const notes = document.getElementById('newNotes').value.trim();
             if (!email || !email.includes('@')) { alert('Enter a valid email.'); return; }
             if (email.endsWith('@vysusgroup.com')) { alert('Vysus emails are automatically allowed.'); return; }
+            debugLog('ACTION', 'Adding external user', { email });
             try {
                 const { error } = await sb.from('allowed_external_emails').insert({ email, notes: notes || null });
-                if (error) throw error;
+                if (error) {
+                    debugLog('ACTION', 'Add user failed', error.message);
+                    throw error;
+                }
+                debugLog('ACTION', 'User added successfully', { email });
                 await logActivity('add_external_user', { email });
                 loadManageUsers();
             } catch (err) {
@@ -406,9 +532,14 @@
 
         async function removeUser(id, email) {
             if (!confirm('Remove access for ' + email + '?')) return;
+            debugLog('ACTION', 'Removing external user', { email, id });
             try {
                 const { error } = await sb.from('allowed_external_emails').delete().eq('id', id);
-                if (error) throw error;
+                if (error) {
+                    debugLog('ACTION', 'Remove user failed', error.message);
+                    throw error;
+                }
+                debugLog('ACTION', 'User removed successfully', { email });
                 await logActivity('remove_external_user', { email });
                 loadManageUsers();
             } catch (err) {

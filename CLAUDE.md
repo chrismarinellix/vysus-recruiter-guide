@@ -58,12 +58,25 @@ This is **Vysus Recruiter Guide** - a pre-screening tool for recruiters at Vysus
 - Strict scoring: strong/partial/none based on explicit resume evidence only
 
 ## Supabase Tables
-- `recruiter_profiles` - User profiles with roles
+- `recruiter_profiles` - User profiles with roles (has `login_count` column)
 - `interviewed_candidates` - Past candidate records
 - `resume_analyses` - Saved resume analysis results
 - `quiz_submissions` - Screening quiz results
 - `activity_log` - User activity tracking
 - `screening_results` - Screening outcomes
+- `allowed_external_emails` - Whitelist for non-Vysus email signups
+
+## RLS (Row Level Security)
+All tables have RLS enabled. Admin access uses a `SECURITY DEFINER` function `is_admin()` to avoid infinite recursion.
+
+**If you see "infinite recursion detected in policy" errors:**
+Run `supabase/fix-rls-recursion.sql` in Supabase SQL Editor.
+
+**Key RLS patterns:**
+- `public.is_admin()` - Checks if current user is admin (bypasses RLS)
+- Users can view/update their own rows
+- Admins can view all rows
+- Activity log allows anonymous inserts
 
 ## Design System
 Vysus Group brand colours:

@@ -58,11 +58,27 @@ curl -X POST http://localhost:8888/api/analyze-resume \
 - Check Auth: Users who have logged in
 - Check Storage: Uploaded resumes
 
+### 6. Admin Panel (admin.html)
+- [ ] Only accessible by chris.marinelli@vysusgroup.com
+- [ ] Debug banner shows admin profile status
+- [ ] "All Activity" tab shows activity log entries
+- [ ] "User Logins" tab shows all registered users with last login times
+- [ ] "All Screenings" tab shows screening results
+- [ ] "All Analyses" tab shows resume analyses
+- [ ] "Manage External Users" tab allows adding/removing external emails
+- [ ] "Debug Logs" tab shows real-time query debugging
+
 ## Troubleshooting
 
 ### "Not authenticated" errors
 - Clear localStorage: `localStorage.clear()` in browser console
 - Try logging in again
+
+### "infinite recursion detected in policy" error
+This is an RLS policy issue in Supabase. Fix:
+1. Go to Supabase SQL Editor
+2. Run the contents of `supabase/fix-rls-recursion.sql`
+3. This creates a `SECURITY DEFINER` function to bypass the recursion
 
 ### Groq API errors
 - Check GROQ_API_KEY is set (hardcoded in analyze-resume.js for now)
@@ -71,3 +87,18 @@ curl -X POST http://localhost:8888/api/analyze-resume \
 ### Supabase connection issues
 - Verify keys in js/supabase-client.js match your project
 - Check RLS policies in Supabase dashboard
+
+### Admin panel shows empty data
+1. Check Debug Logs tab for specific errors
+2. Run `supabase/fix-rls-recursion.sql` to fix RLS policies
+3. Verify your admin profile exists:
+   ```sql
+   SELECT * FROM recruiter_profiles WHERE email = 'chris.marinelli@vysusgroup.com';
+   ```
+4. If no profile, insert it:
+   ```sql
+   INSERT INTO recruiter_profiles (id, email, role)
+   SELECT id, email, 'admin' FROM auth.users
+   WHERE email = 'chris.marinelli@vysusgroup.com'
+   ON CONFLICT (id) DO UPDATE SET role = 'admin';
+   ```
