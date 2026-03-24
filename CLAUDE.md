@@ -88,11 +88,26 @@ Vysus Group brand colours:
 - `--vysus-stavanger-ice: #EDEDED` (borders)
 - `--vysus-bergen-rain: #DADADA` (dividers)
 
-## Deployment
+## Deployment — CRITICAL
 - **Site URL**: https://vysus-recruiter-guide.netlify.app
-- **Deploy from**: `C:\Code\projects\vysus-recruiter-guide`
+- **Netlify Site ID**: `5a1d87fa-efe3-4a96-be9c-e7be4592d7b3`
+- **Deploy from**: `C:\Temp\recruiter-guide-repo` (the git repo root, NOT `C:\Temp\recruiter-guide`)
+- **ALWAYS deploy from the repo root** — it contains all pages (login.html, admin.html, candidates.html, js/, netlify.toml)
+- Deploying from the wrong folder will cause 404s for login, JS files, and sub-pages
 - Publishes root directory (no build step)
 - API routes redirect `/api/*` to `/.netlify/functions/:splat`
+
+### Deploy Command
+```bash
+cd "C:\Temp\recruiter-guide-repo"
+npx netlify-cli deploy --prod --site=5a1d87fa-efe3-4a96-be9c-e7be4592d7b3
+```
+
+## Authentication
+- **login.html** uses Supabase Auth (email/password, signup, forgot password, reset)
+- DO NOT replace with a simple access code gate — Jasmine and other recruiters use password reset
+- Dev bypass only shown on localhost via `devMode` div
+- Demo preview modal on login page ("See how it works" link) — for unauthenticated visitors
 
 ## Environment Variables (Netlify Dashboard)
 - `GROQ_API_KEY` - Required for resume analysis function

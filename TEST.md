@@ -7,7 +7,7 @@
 ## Start Local Server
 
 ```bash
-cd /Users/chris/Documents/Code/vysus-recruiter-guide
+cd "C:\Temp\recruiter-guide-repo"
 netlify dev
 ```
 
@@ -36,13 +36,31 @@ This will start:
 - [ ] Location filter works
 - [ ] Stats cards show correct counts
 
-### 4. Resume Analyzer (resume-analyzer.html)
-- [ ] File upload accepts PDF/DOC/DOCX
+### 4. Resume Analyzer (inline on index.html)
+- [ ] File upload accepts PDF/DOCX/TXT
+- [ ] PDF with browser MIME type `application/octet-stream` still works (extension fallback)
+- [ ] DOCX downloaded from email/cloud still works (extension fallback)
+- [ ] Old .doc format shows clear error message (not silent fail)
+- [ ] Scanned/image PDF shows specific error with character count
 - [ ] Drag & drop works
+- [ ] Paste text fallback works
 - [ ] Position selector (Senior/Lead/Principal)
 - [ ] Analyze button triggers Groq API
-- [ ] Skills display with pulse animation for matches
-- [ ] Analysis saves to history
+- [ ] Error messages show inline (red banner below upload), NOT as browser alert()
+- [ ] Skills highlight on role cards with strong/partial/none classes
+- [ ] Lead skills array has exactly 9 entries (not 10)
+- [ ] Analysis saves to Supabase
+- [ ] Debug log panel visible for admin (chris.marinelli@vysusgroup.com)
+- [ ] Error-level debug entries persist to activity_log table
+
+### 4b. Login Page
+- [ ] Supabase email/password sign-in works
+- [ ] "Create Account" flow works for whitelisted emails
+- [ ] "Forgot password?" sends reset link
+- [ ] Password reset callback updates password
+- [ ] "See how it works" demo link opens modal (subtle, grey text)
+- [ ] Dev bypass only visible on localhost
+- [ ] DO NOT replace with simple access code gate
 
 ### 5. Netlify Function
 Test directly:
