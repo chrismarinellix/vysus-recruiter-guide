@@ -274,7 +274,7 @@ function generateFallbackAnalysis(resumeText, targetPosition, roleRequirements) 
     summary: `Automated analysis based on keyword matching. Manual review recommended.`,
     roleMatches: {
       senior: { score: techScore, skills: Array(8).fill(techScore > 50 ? 'partial' : 'none') },
-      lead: { score: leadScore, skills: Array(10).fill(leadScore > 50 ? 'partial' : 'none') },
+      lead: { score: leadScore, skills: Array(9).fill(leadScore > 50 ? 'partial' : 'none') },
       principal: { score: stratScore, skills: Array(8).fill(stratScore > 50 ? 'partial' : 'none') }
     },
     recommendation: `Consider for ${recommendedLevel} role pending technical interview`,

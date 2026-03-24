@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recruiter Pre-Screening Guide | Vysus Group</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
     <script>
         if (typeof pdfjsLib !== 'undefined') {
             pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -1536,12 +1537,88 @@
             <h2 id="authTitle">Checking Authentication...</h2>
             <p id="authSubtitle">Please wait while we verify your access.</p>
             <div id="loginPrompt" style="display: none;">
-                <a href="/login.html" class="password-btn" style="display: inline-block; text-decoration: none; margin-top: 20px;">Sign In</a>
+                <a class='password-btn' href='/login' style='display: inline-block; text-decoration: none; margin-top: 20px;'>Sign In</a>
+                <div style="margin-top: 24px;">
+                    <a href="#" onclick="showDemo(); return false;" style="color: rgba(255,255,255,0.4); font-size: 12px; text-decoration: none; letter-spacing: 0.5px; transition: color 0.3s;" onmouseover="this.style.color='#00E3A9'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">See how it works &rarr;</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Demo Modal (no auth required) -->
+    <div id="demoModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:10000; overflow-y:auto;">
+        <div style="max-width:720px; margin:40px auto; padding:40px; background:#fff; border-radius:8px; position:relative;">
+            <button onclick="document.getElementById('demoModal').style.display='none'" style="position:absolute; top:16px; right:20px; background:none; border:none; font-size:24px; cursor:pointer; color:#999;">&times;</button>
+            <div style="margin-bottom:24px;">
+                <span style="display:inline-block; background:#005454; color:#fff; font-size:10px; font-weight:600; letter-spacing:1px; padding:4px 10px; border-radius:3px; text-transform:uppercase;">Demo</span>
+                <h2 style="font-weight:300; color:#005454; margin-top:12px; font-size:28px;">Resume Analyzer Preview</h2>
+                <p style="color:#485559; font-size:14px; margin-top:8px; line-height:1.5;">Upload a candidate's CV and our AI instantly maps their experience against Vysus Grid Connection Engineer role requirements at Senior, Lead, and Principal level.</p>
+            </div>
+
+            <div style="background:#f8f8f8; border-radius:6px; padding:24px; margin-bottom:20px;">
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+                    <span style="background:#00E3A9; color:#005454; font-weight:700; font-size:18px; width:42px; height:42px; display:flex; align-items:center; justify-content:center; border-radius:50%;">72%</span>
+                    <div>
+                        <div style="font-weight:500; color:#1D1D1B; font-size:15px;">Sample Candidate — Jane Chen</div>
+                        <div style="font-size:12px; color:#485559;">Recommended: <strong style="color:#005454;">Lead Engineer</strong></div>
+                    </div>
+                </div>
+                <p style="font-size:13px; color:#485559; line-height:1.6; margin-bottom:16px;">Strong power systems background with 8 years in renewable grid connections. Demonstrated PSCAD and PSS/E proficiency across multiple NEM projects. Shows clear leadership trajectory with project oversight and NSP engagement experience.</p>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                    <div>
+                        <div style="font-size:11px; font-weight:600; color:#005454; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">Key Strengths</div>
+                        <ul style="font-size:12px; color:#485559; line-height:1.8; padding-left:16px; margin:0;">
+                            <li>R1/R2 study delivery across 6 solar/BESS projects</li>
+                            <li>PSCAD & PSS/E with model validation experience</li>
+                            <li>Direct Transgrid & AEMO engagement</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <div style="font-size:11px; font-weight:600; color:#F92D63; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">Gaps to Explore</div>
+                        <ul style="font-size:12px; color:#485559; line-height:1.8; padding-left:16px; margin:0;">
+                            <li>No business development evidence</li>
+                            <li>Budget management not mentioned</li>
+                            <li>Limited industry thought leadership</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div style="background:#f8f8f8; border-radius:6px; padding:20px; margin-bottom:20px;">
+                <div style="font-size:11px; font-weight:600; color:#005454; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px;">Skill Match Preview</div>
+                <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:12px;">
+                    <div>
+                        <div style="font-size:12px; font-weight:500; color:#1D1D1B; margin-bottom:6px;">Senior (85%)</div>
+                        <div style="height:6px; background:#EDEDED; border-radius:3px; overflow:hidden;"><div style="width:85%; height:100%; background:#00E3A9; border-radius:3px;"></div></div>
+                    </div>
+                    <div>
+                        <div style="font-size:12px; font-weight:500; color:#1D1D1B; margin-bottom:6px;">Lead (68%)</div>
+                        <div style="height:6px; background:#EDEDED; border-radius:3px; overflow:hidden;"><div style="width:68%; height:100%; background:#00E3A9; border-radius:3px;"></div></div>
+                    </div>
+                    <div>
+                        <div style="font-size:12px; font-weight:500; color:#1D1D1B; margin-bottom:6px;">Principal (35%)</div>
+                        <div style="height:6px; background:#EDEDED; border-radius:3px; overflow:hidden;"><div style="width:35%; height:100%; background:#DADADA; border-radius:3px;"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align:center; padding-top:8px;">
+                <a href="/login" style="display:inline-block; background:#005454; color:#fff; padding:12px 32px; text-decoration:none; font-size:13px; font-weight:500; letter-spacing:0.5px; border-radius:4px; transition: background 0.3s;" onmouseover="this.style.background='#00E3A9'; this.style.color='#005454'" onmouseout="this.style.background='#005454'; this.style.color='#fff'">Sign In to Try It</a>
+                <p style="font-size:11px; color:#999; margin-top:12px;">Contact chris.marinelli@vysusgroup.com for access</p>
             </div>
         </div>
     </div>
 
     <div class="protected-content" id="protectedContent">
+
+    <!-- Passkey registration banner -->
+    <div id="passkeyBanner" style="display:none; background: #005454; color: #fff; padding: 14px 24px; text-align: center; font-size: 14px; position: relative; z-index: 100;">
+        <span style="margin-right: 12px;">Speed up your next login — set up a passkey (fingerprint/face)</span>
+        <button onclick="handlePasskeyRegister()" style="background: #00E3A9; color: #005454; border: none; padding: 8px 20px; font-weight: 600; cursor: pointer; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">Set Up</button>
+        <button onclick="dismissPasskeyBanner()" style="background: transparent; color: rgba(255,255,255,0.6); border: 1px solid rgba(255,255,255,0.3); padding: 8px 16px; cursor: pointer; font-size: 13px; margin-left: 8px;">Not Now</button>
+    </div>
+
     <header class="header">
         <div class="header-content">
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
@@ -1555,9 +1632,9 @@
                 <div id="userInfo" style="text-align: right; color: var(--vysus-white); font-size: 13px;">
                     <span id="userEmail" style="opacity: 0.8;"></span>
                     <div style="margin-top: 8px;">
-                        <a href="/candidates.html" style="color: var(--vysus-stockholm-neon); text-decoration: none; margin-right: 16px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Candidates</a>
+                        <a href='/candidates' style='color: var(--vysus-stockholm-neon); text-decoration: none; margin-right: 16px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;'>Candidates</a>
                         <a href="#" onclick="showSetPassword(); return false;" style="color: var(--vysus-stockholm-neon); text-decoration: none; margin-right: 16px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Set Password</a>
-                        <a href="/admin.html" id="adminGear" style="display: none; color: var(--vysus-stockholm-neon); text-decoration: none; margin-right: 16px; font-size: 18px; vertical-align: middle;" title="Admin Dashboard">&#9881;</a>
+                        <a href='/admin' id='adminGear' style='display: none; color: var(--vysus-stockholm-neon); text-decoration: none; margin-right: 16px; font-size: 18px; vertical-align: middle;' title='Admin Dashboard'>&#9881;</a>
                         <button onclick="handleSignOut()" style="background: transparent; border: 1px solid rgba(255,255,255,0.3); color: var(--vysus-white); padding: 6px 12px; font-size: 11px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px;">Sign Out</button>
                     </div>
                 </div>
@@ -1616,6 +1693,24 @@
                 </div>
                 <div id="userContent">
                     <p style="color: rgba(255,255,255,0.5); font-size: 13px;">Loading...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Debug Log Panel (admin only) -->
+        <div class="admin-panel" id="debugLogPanel" style="display: none;">
+            <div class="admin-panel-header" onclick="toggleDebugPanel()">
+                <h3>Debug Log (Resume Uploads)</h3>
+                <span id="debugToggle">View</span>
+            </div>
+            <div class="admin-panel-body" id="debugBody">
+                <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                    <button class="admin-tab" onclick="clearDebugLog()" style="font-size: 11px; padding: 4px 10px;">Clear Log</button>
+                    <button class="admin-tab" onclick="copyDebugLog()" style="font-size: 11px; padding: 4px 10px;">Copy to Clipboard</button>
+                    <span id="debugCount" style="color: rgba(255,255,255,0.4); font-size: 11px; line-height: 28px; margin-left: auto;">0 entries</span>
+                </div>
+                <div id="debugLogContent" style="max-height: 400px; overflow-y: auto; font-family: monospace; font-size: 11px; line-height: 1.6;">
+                    <p style="color: rgba(255,255,255,0.4);">No debug entries yet. Upload a resume to see logs.</p>
                 </div>
             </div>
         </div>
@@ -2278,6 +2373,7 @@
     </div>
 
     <script src="js/supabase-client.js"></script>
+    <script src="js/webauthn-client.js"></script>
     <script src="js/role-requirements.js"></script>
     <script>
         // Resume Analyzer
@@ -2310,12 +2406,57 @@
             }
         });
 
+        // Debug log for admin visibility
+        const _debugLog = [];
+        function debugLog(stage, detail, level = 'info') {
+            const entry = { time: new Date().toISOString(), stage, detail, level };
+            _debugLog.push(entry);
+            if (level === 'error') {
+                console.error(`[ResumeDebug] ${stage}:`, detail);
+                persistDebugLog(entry);
+            } else {
+                console.log(`[ResumeDebug] ${stage}:`, detail);
+            }
+            // Update admin debug panel if visible
+            const panel = document.getElementById('debugLogContent');
+            if (panel) renderDebugLog(panel);
+        }
+
+        function getFileTypeFromExtension(fileName) {
+            const ext = fileName.toLowerCase().split('.').pop();
+            const map = {
+                'pdf': 'application/pdf',
+                'doc': 'application/msword',
+                'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'txt': 'text/plain',
+                'rtf': 'text/plain'
+            };
+            return map[ext] || null;
+        }
+
         async function handleResumeFile(file) {
+            debugLog('file_selected', { name: file.name, size: file.size, reportedType: file.type });
+
             const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
-            if (!validTypes.includes(file.type)) {
-                alert('Please upload a PDF, DOC, DOCX, or TXT file.');
+            let effectiveType = file.type;
+
+            // Fallback: if MIME type is empty or generic, infer from extension
+            if (!effectiveType || effectiveType === 'application/octet-stream') {
+                effectiveType = getFileTypeFromExtension(file.name);
+                debugLog('mime_fallback', { originalType: file.type, inferredType: effectiveType });
+            }
+
+            if (!effectiveType || !validTypes.includes(effectiveType)) {
+                const ext = file.name.split('.').pop().toLowerCase();
+                const errMsg = `Unsupported file type: "${file.type || 'unknown'}" (extension: .${ext}). Please upload a PDF, DOCX, or TXT file.`;
+                debugLog('file_rejected', { type: file.type, ext, effectiveType }, 'error');
+                showResumeError(errMsg);
                 return;
             }
+
+            // Override file.type for downstream use
+            Object.defineProperty(file, '_effectiveType', { value: effectiveType });
+            debugLog('file_accepted', { effectiveType });
             resumeFile = file;
             document.getElementById('selectedFileName').textContent = file.name;
             document.getElementById('fileSelected').classList.add('visible');
@@ -2324,6 +2465,7 @@
             // Extract name and email
             try {
                 const text = await readResumeText(file);
+                debugLog('text_extracted', { length: text.length, preview: text.substring(0, 100) });
                 const emailMatch = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
                 if (emailMatch) document.getElementById('resumeCandidateEmail').value = emailMatch[0];
 
@@ -2334,14 +2476,33 @@
                         document.getElementById('resumeCandidateName').value = nameLine;
                     }
                 }
-            } catch (err) { console.log('Could not extract info:', err); }
+            } catch (err) {
+                debugLog('extract_failed', { error: err.message }, 'error');
+                showResumeError(err.message);
+            }
+        }
+
+        function showResumeError(msg) {
+            // Show inline error below upload area instead of alert
+            let errDiv = document.getElementById('resumeUploadError');
+            if (!errDiv) {
+                errDiv = document.createElement('div');
+                errDiv.id = 'resumeUploadError';
+                errDiv.style.cssText = 'margin: 12px 0; padding: 12px 16px; background: rgba(249,45,99,0.08); border-left: 4px solid #F92D63; border-radius: 4px; font-size: 13px; color: #F92D63; font-weight: 400;';
+                const upload = document.getElementById('analyzerUpload');
+                if (upload) upload.parentNode.insertBefore(errDiv, upload.nextSibling);
+            }
+            errDiv.textContent = msg;
+            errDiv.style.display = 'block';
+            setTimeout(() => { errDiv.style.display = 'none'; }, 15000);
         }
 
         function readResumeText(file) {
+            const fileType = file._effectiveType || file.type;
+            debugLog('read_start', { fileType, fileName: file.name });
             return new Promise(async (resolve, reject) => {
                 try {
-                    if (file.type === 'application/pdf') {
-                        // Use PDF.js for actual text extraction
+                    if (fileType === 'application/pdf') {
                         const arrayBuffer = await file.arrayBuffer();
                         const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
                         let fullText = '';
@@ -2351,9 +2512,28 @@
                             const pageText = content.items.map(item => item.str).join(' ');
                             fullText += pageText + '\n';
                         }
+                        if (fullText.trim().length < 50) {
+                            debugLog('pdf_scanned', { extractedLength: fullText.trim().length }, 'error');
+                            reject(new Error('This PDF appears to be scanned/image-based (' + fullText.trim().length + ' chars extracted). Please paste the resume text instead using "Paste text" option.'));
+                            return;
+                        }
+                        debugLog('pdf_extracted', { pages: pdf.numPages, chars: fullText.length });
                         resolve(fullText);
+                    } else if (fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || file.name.endsWith('.docx')) {
+                        const arrayBuffer = await file.arrayBuffer();
+                        if (typeof mammoth !== 'undefined') {
+                            const result = await mammoth.extractRawText({ arrayBuffer });
+                            if (!result.value || result.value.trim().length < 50) {
+                                reject(new Error('Could not extract text from this DOCX. Please paste the resume text instead.'));
+                                return;
+                            }
+                            resolve(result.value);
+                        } else {
+                            reject(new Error('DOCX parser not loaded. Please upload a PDF or paste the resume text instead.'));
+                        }
+                    } else if (fileType === 'application/msword' || file.name.endsWith('.doc')) {
+                        reject(new Error('Old .doc format is not supported. Please save as .docx or PDF and try again, or paste the resume text.'));
                     } else {
-                        // Text/DOC files
                         const reader = new FileReader();
                         reader.onload = (e) => resolve(e.target.result);
                         reader.onerror = reject;
@@ -2393,6 +2573,7 @@
 
             try {
                 const fileContent = pastedText || await readResumeText(resumeFile);
+                debugLog('analysis_start', { candidateName: name, position, textLength: fileContent.length });
 
                 const response = await fetch('/.netlify/functions/analyze-resume', {
                     method: 'POST',
@@ -2405,9 +2586,20 @@
                     })
                 });
 
-                if (!response.ok) throw new Error('Analysis failed');
+                if (!response.ok) {
+                    const errBody = await response.text().catch(() => 'No response body');
+                    debugLog('api_error', { status: response.status, body: errBody }, 'error');
+                    throw new Error(`Analysis failed (HTTP ${response.status}): ${errBody.substring(0, 200)}`);
+                }
 
                 const analysis = await response.json();
+                debugLog('analysis_complete', {
+                    overallScore: analysis.overallScore,
+                    recommendedLevel: analysis.recommendedLevel,
+                    seniorSkills: analysis.roleMatches?.senior?.skills?.length,
+                    leadSkills: analysis.roleMatches?.lead?.skills?.length,
+                    principalSkills: analysis.roleMatches?.principal?.skills?.length
+                });
 
                 // Auto-fill name and email from AI extraction if fields are empty
                 const nameField = document.getElementById('resumeCandidateName');
@@ -2456,8 +2648,8 @@
                 loadRecentAnalyses();
 
             } catch (err) {
-                console.error('Analysis error:', err);
-                alert('Error analyzing resume. Please try again.');
+                debugLog('analysis_failed', { error: err.message, stack: err.stack }, 'error');
+                showResumeError(err.message || 'Error analyzing resume. Please try again.');
             } finally {
                 document.getElementById('analyzingIndicator').classList.remove('visible');
                 document.getElementById('analyzeResumeBtn').disabled = false;
@@ -2515,8 +2707,9 @@
 
         // Initialize and check authentication
         let authHandled = false;
+        let currentAccessLevel = 'limited';
 
-        function unlockApp(session) {
+        async function unlockApp(session) {
             if (authHandled) return;
             authHandled = true;
             const overlay = document.getElementById('passwordOverlay');
@@ -2524,16 +2717,39 @@
             overlay.style.display = 'none';
             content.classList.add('unlocked');
             document.getElementById('userEmail').textContent = session.user.email;
-            document.getElementById('userPanel').classList.add('visible');
 
             if (session.user.email === 'chris.marinelli@vysusgroup.com') {
                 document.getElementById('adminGear').style.display = 'inline';
+                document.getElementById('debugLogPanel').style.display = 'block';
+            }
+
+            // Check access level - limited users can't see screening results, resume analyzer, or My Screenings
+            const accessLevel = await getUserAccessLevel();
+            currentAccessLevel = accessLevel;
+            if (accessLevel === 'standard' || accessLevel === 'admin') {
+                document.getElementById('userPanel').classList.add('visible');
+                loadRecentAnalyses().catch(() => {});
+            } else {
+                // Limited: hide screening form, resume analyzer, My Screenings
+                const analyzerSection = document.querySelector('.analyzer-section');
+                if (analyzerSection) analyzerSection.style.display = 'none';
+                const userPanel = document.getElementById('userPanel');
+                if (userPanel) userPanel.style.display = 'none';
             }
 
             // Non-blocking background tasks
             updateLastLogin(session.user.id).catch(() => {});
             logActivity('view_screening_guide', { page: 'index.html' }).catch(() => {});
-            loadRecentAnalyses().catch(() => {});
+
+            // Show passkey registration banner if no passkey registered
+            if (passkeySupported() && !localStorage.getItem('vysus_passkey_dismissed')) {
+                try {
+                    const { data: passkeys } = await sb.from('passkey_credentials').select('id').eq('user_id', session.user.id);
+                    if (!passkeys || passkeys.length === 0) {
+                        document.getElementById('passkeyBanner').style.display = 'block';
+                    }
+                } catch (e) { /* table may not exist yet */ }
+            }
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
@@ -2541,9 +2757,13 @@
 
             const overlay = document.getElementById('passwordOverlay');
             const content = document.getElementById('protectedContent');
-            const authTitle = document.getElementById('authTitle');
-            const authSubtitle = document.getElementById('authSubtitle');
-            const loginPrompt = document.getElementById('loginPrompt');
+
+            // Handle error hashes (e.g. expired recovery links)
+            const hashStr = window.location.hash.substring(1);
+            if (hashStr.includes('error=')) {
+                window.location.href = '/login.html';
+                return;
+            }
 
             // Check for dev session first (localhost testing)
             const devSession = localStorage.getItem('vysus_dev_session');
@@ -2555,6 +2775,14 @@
                 document.getElementById('userPanel').classList.add('visible');
                 document.getElementById('adminGear').style.display = 'inline';
                 authHandled = true;
+                return;
+            }
+
+            // If Supabase SDK failed to load, show login prompt with demo
+            if (!sb) {
+                document.getElementById('authTitle').textContent = 'Sign In Required';
+                document.getElementById('authSubtitle').textContent = 'Access the recruiter screening guide and resume analyzer.';
+                document.getElementById('loginPrompt').style.display = 'block';
                 return;
             }
 
@@ -2574,19 +2802,18 @@
                     // Wait briefly for onAuthStateChange to fire (magic link hash processing)
                     setTimeout(() => {
                         if (!authHandled) {
-                            authTitle.textContent = 'Authentication Required';
-                            authSubtitle.textContent = 'Please sign in to access this document.';
-                            loginPrompt.style.display = 'block';
+                            // Show login prompt with demo link instead of immediate redirect
+                            document.getElementById('authTitle').textContent = 'Sign In Required';
+                            document.getElementById('authSubtitle').textContent = 'Access the recruiter screening guide and resume analyzer.';
+                            document.getElementById('loginPrompt').style.display = 'block';
                         }
                     }, 1500);
                 }
             } catch (err) {
                 console.error('Auth check error:', err);
-                if (!authHandled) {
-                    authTitle.textContent = 'Authentication Required';
-                    authSubtitle.textContent = 'Please sign in to access this document.';
-                    loginPrompt.style.display = 'block';
-                }
+                document.getElementById('authTitle').textContent = 'Sign In Required';
+                document.getElementById('authSubtitle').textContent = 'Access the recruiter screening guide and resume analyzer.';
+                document.getElementById('loginPrompt').style.display = 'block';
             }
         });
 
@@ -2645,10 +2872,12 @@
 
         // Sign out handler
         async function handleSignOut() {
-            // Clear dev session if exists
             localStorage.removeItem('vysus_dev_session');
-            await logActivity('sign_out', {});
-            await signOut();
+            if (sb) {
+                await logActivity('sign_out', {}).catch(() => {});
+                await signOut().catch(() => {});
+            }
+            window.location.href = '/login.html';
         }
 
         // Add score dots to all question headers
@@ -2658,6 +2887,16 @@
             dots.id = 'dots-' + i;
             dots.innerHTML = '<span class="score-dot"></span><span class="score-dot"></span><span class="score-dot"></span><span class="score-dot"></span><span class="score-dot"></span>';
             header.appendChild(dots);
+        });
+
+        // Track when candidate name is entered for screening
+        let screeningNameLogged = '';
+        document.getElementById('candidateName').addEventListener('change', function() {
+            const name = this.value.trim();
+            if (name && name !== screeningNameLogged) {
+                screeningNameLogged = name;
+                logActivity('start_screening', { candidate: name }).catch(() => {});
+            }
         });
 
         // Scoring functionality
@@ -2833,6 +3072,8 @@
 
         let autoSaveTimeout = null;
         function autoSaveScreening() {
+            // Only standard/admin users save screening data
+            if (currentAccessLevel === 'limited') return;
             // Debounce to avoid rapid saves when clicking quickly
             if (autoSaveTimeout) clearTimeout(autoSaveTimeout);
             autoSaveTimeout = setTimeout(async () => {
@@ -2879,6 +3120,11 @@
                         caution: recCautionText || null,
                         previously_interviewed: wasInterviewed,
                         interview_history: wasInterviewed ? interviewCheck.matches : null
+                    });
+                    // Also add/update candidate on candidates page
+                    await addCandidateFromScreening(name, {
+                        recommended_level: recLevelText !== '-' ? recLevelText : null,
+                        pass_fail: passFail
                     });
                     await logActivity('auto_save_screening', { candidate: name, result: passFail, level: recLevelText });
                     statusEl.textContent = 'Saved';
@@ -3084,6 +3330,90 @@
             } catch (err) {
                 console.log('Interview check failed:', err);
             }
+        }
+
+        // Passkey registration from banner
+        async function handlePasskeyRegister() {
+            const { session } = await getSession();
+            if (!session) return;
+            const result = await registerPasskey(session.access_token);
+            const banner = document.getElementById('passkeyBanner');
+            if (result.success) {
+                banner.innerHTML = '<span style="color: #00E3A9;">Passkey registered! Next time, just use your fingerprint or face to sign in.</span>';
+                setTimeout(() => { banner.style.display = 'none'; }, 4000);
+            } else {
+                banner.innerHTML = '<span style="color: #F92D63;">' + result.error + '</span>';
+                setTimeout(() => { banner.style.display = 'none'; }, 3000);
+            }
+        }
+
+        function dismissPasskeyBanner() {
+            document.getElementById('passkeyBanner').style.display = 'none';
+            localStorage.setItem('vysus_passkey_dismissed', '1');
+        }
+
+        // Demo modal
+        function showDemo() {
+            document.getElementById('demoModal').style.display = 'block';
+        }
+
+        // Debug Log Panel functions (admin only)
+        function toggleDebugPanel() {
+            const body = document.getElementById('debugBody');
+            const toggle = document.getElementById('debugToggle');
+            body.classList.toggle('open');
+            toggle.textContent = body.classList.contains('open') ? 'Close' : 'View';
+        }
+
+        function renderDebugLog(panel) {
+            if (!panel) panel = document.getElementById('debugLogContent');
+            if (!panel || _debugLog.length === 0) return;
+            const countEl = document.getElementById('debugCount');
+            if (countEl) countEl.textContent = _debugLog.length + ' entries';
+
+            panel.innerHTML = _debugLog.map(e => {
+                const time = e.time.split('T')[1].split('.')[0];
+                const color = e.level === 'error' ? '#F92D63' : '#00E3A9';
+                const detail = typeof e.detail === 'object' ? JSON.stringify(e.detail) : e.detail;
+                return `<div style="border-bottom: 1px solid rgba(255,255,255,0.06); padding: 4px 0;">` +
+                    `<span style="color: rgba(255,255,255,0.3);">${time}</span> ` +
+                    `<span style="color: ${color}; font-weight: 600;">[${e.stage}]</span> ` +
+                    `<span style="color: rgba(255,255,255,0.7);">${detail}</span></div>`;
+            }).reverse().join('');
+        }
+
+        function clearDebugLog() {
+            _debugLog.length = 0;
+            const panel = document.getElementById('debugLogContent');
+            if (panel) panel.innerHTML = '<p style="color: rgba(255,255,255,0.4);">Log cleared.</p>';
+            const countEl = document.getElementById('debugCount');
+            if (countEl) countEl.textContent = '0 entries';
+        }
+
+        function copyDebugLog() {
+            const text = _debugLog.map(e => {
+                const detail = typeof e.detail === 'object' ? JSON.stringify(e.detail) : e.detail;
+                return `${e.time} [${e.level}] ${e.stage}: ${detail}`;
+            }).join('\n');
+            navigator.clipboard.writeText(text || 'No debug entries').then(() => {
+                const btn = event.target;
+                btn.textContent = 'Copied!';
+                setTimeout(() => { btn.textContent = 'Copy to Clipboard'; }, 2000);
+            });
+        }
+
+        // Persist error-level debug entries to Supabase for cross-session admin review
+        async function persistDebugLog(entry) {
+            try {
+                if (!sb) return;
+                const { user } = await getUser().catch(() => ({ user: null }));
+                await sb.from('activity_log').insert({
+                    user_id: user?.id || null,
+                    user_email: user?.email || 'anonymous',
+                    action: 'resume_debug_error',
+                    details: { stage: entry.stage, detail: entry.detail, time: entry.time }
+                });
+            } catch (e) { /* non-blocking */ }
         }
     </script>
 </body>
