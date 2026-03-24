@@ -2582,7 +2582,8 @@
                         resumeText: fileContent,
                         candidateName: name,
                         targetPosition: position,
-                        roleRequirements: window.roleRequirements
+                        roleRequirements: window.roleRequirements,
+                        industryRequirements: window.industryRequirements
                     })
                 });
 
@@ -2669,6 +2670,42 @@
 
             document.getElementById('aiGaps').innerHTML = (analysis.gaps || [])
                 .map(g => `<li>${g}</li>`).join('') || '<li>None identified</li>';
+
+            // Show industry matches if present
+            const indMatches = analysis.industryMatches;
+            let indHtml = '';
+            if (indMatches) {
+                const indReqs = window.industryRequirements || {};
+                const roles = ['senior', 'lead', 'principal'];
+                const roleLabels = { senior: 'Senior', lead: 'Lead', principal: 'Principal' };
+                let items = [];
+                roles.forEach(role => {
+                    const skills = indMatches[role]?.skills || [];
+                    const reqs = indReqs[role]?.skills || [];
+                    skills.forEach((match, i) => {
+                        if (match === 'strong' || match === 'partial') {
+                            const label = reqs[i]?.name || `Industry skill ${i+1}`;
+                            const badge = match === 'strong'
+                                ? '<span style="color:#00E3A9; font-weight:600;">Strong</span>'
+                                : '<span style="color:#ffc107;">Partial</span>';
+                            items.push(`<li style="font-size:12px;">${badge} — ${label} <span style="color:#6C63FF; font-size:10px; font-weight:600;">(INDUSTRY)</span></li>`);
+                        }
+                    });
+                });
+                if (items.length > 0) {
+                    indHtml = '<div style="margin-top:12px; padding-top:12px; border-top:1px solid rgba(0,0,0,0.08);"><div style="font-size:11px; font-weight:600; color:#6C63FF; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">Industry-General Skills Detected</div><ul style="margin:0; padding-left:16px;">' + items.join('') + '</ul></div>';
+                }
+            }
+
+            // Insert industry section after gaps
+            const gapsEl = document.getElementById('aiGaps');
+            let indEl = document.getElementById('aiIndustry');
+            if (!indEl) {
+                indEl = document.createElement('div');
+                indEl.id = 'aiIndustry';
+                gapsEl.parentNode.insertBefore(indEl, gapsEl.nextSibling);
+            }
+            indEl.innerHTML = indHtml;
 
             result.classList.add('visible');
         }

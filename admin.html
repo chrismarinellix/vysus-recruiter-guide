@@ -200,6 +200,7 @@
             <button class="tab" onclick="showTab('screenings', this)">All Screenings</button>
             <button class="tab" onclick="showTab('analyses', this)">All Analyses</button>
             <button class="tab" onclick="showTab('manageUsers', this)">Manage External Users</button>
+            <button class="tab" onclick="showTab('criteria', this)">Assessment Criteria</button>
             <button class="tab" onclick="showTab('debug', this)" style="margin-left: auto; color: #ffc107;">Debug Logs</button>
         </div>
         <div class="panel" id="panel">
@@ -213,6 +214,7 @@
     <div class="footer">Tool developed by CM</div>
 
     <script src="js/supabase-client.js"></script>
+    <script src="js/role-requirements.js"></script>
     <script>
         // Debug logging helper
         const debugLogs = [];
@@ -332,6 +334,7 @@
             else if (tab === 'screenings') loadScreenings();
             else if (tab === 'analyses') loadAnalyses();
             else if (tab === 'manageUsers') loadManageUsers();
+            else if (tab === 'criteria') loadCriteria();
             else if (tab === 'debug') updateDebugPanel();
         }
 
@@ -528,6 +531,47 @@
             } catch (err) {
                 alert('Error: ' + (err.message || err));
             }
+        }
+
+        function loadCriteria() {
+            const panel = document.getElementById('panel');
+            const reqs = window.roleRequirements || {};
+            const industryReqs = window.industryRequirements || {};
+            const roles = ['senior', 'lead', 'principal'];
+            const roleTitles = { senior: 'Senior Engineer — Technical Delivery', lead: 'Lead Engineer — Technical Leadership', principal: 'Principal Engineer — Strategic Leadership' };
+
+            let html = '<p class="info">These are the exact competencies used by the Groq AI when analyzing resumes. Skills marked <span style="color:#00E3A9; font-weight:600;">VYSUS</span> are Vysus-specific. Skills marked <span style="color:#6C63FF; font-weight:600;">INDUSTRY</span> are general power systems engineering requirements.</p>';
+
+            roles.forEach(role => {
+                const vysusSkills = reqs[role]?.skills || [];
+                const indSkills = industryReqs[role]?.skills || [];
+                const title = roleTitles[role];
+                const includesPrev = reqs[role]?.includesPrevious ? ' <span style="font-size:11px; opacity:0.6;">(includes all previous level skills)</span>' : '';
+
+                html += '<div style="margin-bottom:24px;">';
+                html += '<h3 style="color:var(--vysus-malmo-green); font-size:16px; font-weight:500; margin-bottom:12px; border-bottom:2px solid var(--vysus-stavanger-ice); padding-bottom:8px;">' + title + includesPrev + '</h3>';
+                html += '<table><thead><tr><th>#</th><th>Source</th><th>Competency</th><th>Keywords Checked</th></tr></thead><tbody>';
+
+                vysusSkills.forEach((skill, i) => {
+                    html += '<tr><td>' + (i+1) + '</td><td><span style="background:rgba(0,227,169,0.15); color:#005454; padding:2px 8px; border-radius:3px; font-size:10px; font-weight:600; letter-spacing:0.5px;">VYSUS</span></td><td style="font-weight:500;">' + skill.name + '</td><td style="font-size:11px; opacity:0.7;">' + skill.keywords.join(', ') + '</td></tr>';
+                });
+
+                indSkills.forEach((skill, i) => {
+                    html += '<tr style="background:rgba(108,99,255,0.03);"><td>' + (vysusSkills.length + i + 1) + '</td><td><span style="background:rgba(108,99,255,0.15); color:#6C63FF; padding:2px 8px; border-radius:3px; font-size:10px; font-weight:600; letter-spacing:0.5px;">INDUSTRY</span></td><td style="font-weight:500;">' + skill.name + '</td><td style="font-size:11px; opacity:0.7;">' + skill.keywords.join(', ') + '</td></tr>';
+                });
+
+                html += '</tbody></table></div>';
+            });
+
+            // Also show technical keywords
+            const jdKw = window.jobDescriptionKeywords || {};
+            html += '<div style="margin-top:24px;"><h3 style="color:var(--vysus-malmo-green); font-size:16px; font-weight:500; margin-bottom:12px; border-bottom:2px solid var(--vysus-stavanger-ice); padding-bottom:8px;">Technical Keywords Scanned</h3>';
+            Object.entries(jdKw).forEach(([cat, keywords]) => {
+                html += '<p style="margin-bottom:8px;"><strong style="text-transform:capitalize;">' + cat + ':</strong> <span style="font-size:12px; opacity:0.7;">' + keywords.join(', ') + '</span></p>';
+            });
+            html += '</div>';
+
+            panel.innerHTML = html;
         }
 
         async function removeUser(id, email) {

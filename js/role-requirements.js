@@ -69,12 +69,43 @@ const jobDescriptionKeywords = {
   ]
 };
 
+// Industry-general power systems engineer requirements (not Vysus-specific)
+// These supplement the Vysus requirements and are flagged separately in analysis output
+const industryRequirements = {
+  senior: {
+    title: "Senior Engineer — Industry General",
+    skills: [
+      { name: "Power system protection design & coordination", keywords: ["protection", "relay coordination", "protection studies", "relay settings", "overcurrent", "distance protection"] },
+      { name: "Load flow & short circuit analysis", keywords: ["load flow", "power flow", "short circuit", "fault analysis", "fault level", "fault current"] },
+      { name: "Transformer & switchgear specification", keywords: ["transformer", "switchgear", "HV equipment", "circuit breaker", "GIS", "AIS"] },
+      { name: "SCADA / RTU / communications for substations", keywords: ["SCADA", "RTU", "IEC 61850", "DNP3", "substation automation", "telecontrol"] }
+    ]
+  },
+  lead: {
+    title: "Lead Engineer — Industry General",
+    skills: [
+      { name: "EPC / EPCM project delivery experience", keywords: ["EPC", "EPCM", "construction", "commissioning", "site supervision", "FAT", "SAT"] },
+      { name: "Standards compliance (IEC / IEEE / AS)", keywords: ["IEC", "IEEE", "AS/NZS", "standards", "IEC 61400", "IEEE 1547", "AS 4777"] },
+      { name: "Health, safety & environmental management", keywords: ["HSE", "safety", "WHS", "environmental", "risk assessment", "HAZOP", "HAZID"] }
+    ]
+  },
+  principal: {
+    title: "Principal Engineer — Industry General",
+    skills: [
+      { name: "Regulatory & market reform engagement", keywords: ["market reform", "regulatory", "rule change", "policy", "energy transition", "ESB", "AEMC"] },
+      { name: "Due diligence / technical advisory for investment", keywords: ["due diligence", "technical advisory", "lender", "investor", "bankability", "independent engineer"] },
+      { name: "International grid code & interconnection experience", keywords: ["international", "grid code", "interconnection", "ENTSO-E", "FERC", "NERC", "CEA", "CERC"] }
+    ]
+  }
+};
+
 // Export for use in other scripts
 if (typeof window !== 'undefined') {
   window.roleRequirements = roleRequirements;
   window.jobDescriptionKeywords = jobDescriptionKeywords;
+  window.industryRequirements = industryRequirements;
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { roleRequirements, jobDescriptionKeywords };
+  module.exports = { roleRequirements, jobDescriptionKeywords, industryRequirements };
 }

@@ -84,7 +84,7 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    const { resumeText, candidateName, targetPosition, roleRequirements } = JSON.parse(event.body);
+    const { resumeText, candidateName, targetPosition, roleRequirements, industryRequirements } = JSON.parse(event.body);
 
     if (!resumeText) {
       return {
@@ -95,7 +95,7 @@ exports.handler = async (event, context) => {
     }
 
     // Prepare the prompt for Groq
-    const prompt = buildAnalysisPrompt(resumeText, candidateName, targetPosition, roleRequirements);
+    const prompt = buildAnalysisPrompt(resumeText, candidateName, targetPosition, roleRequirements, industryRequirements);
 
     // Call Groq API
     const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -165,7 +165,7 @@ exports.handler = async (event, context) => {
   }
 };
 
-function buildAnalysisPrompt(resumeText, candidateName, targetPosition, roleRequirements) {
+function buildAnalysisPrompt(resumeText, candidateName, targetPosition, roleRequirements, industryRequirements) {
   const seniorSkills = roleRequirements?.senior?.skills?.map(s => s.name).join(', ') ||
     'R1/R2 studies, PSCAD/PSS/E, EMT/RMS simulation, grid code compliance, model validation, technical reports';
 
@@ -174,6 +174,10 @@ function buildAnalysisPrompt(resumeText, candidateName, targetPosition, roleRequ
 
   const principalSkills = roleRequirements?.principal?.skills?.map(s => s.name).join(', ') ||
     'strategic oversight, business development, senior advisory, capacity planning, industry thought leadership';
+
+  const indSenior = industryRequirements?.senior?.skills?.map(s => s.name).join(', ') || '';
+  const indLead = industryRequirements?.lead?.skills?.map(s => s.name).join(', ') || '';
+  const indPrincipal = industryRequirements?.principal?.skills?.map(s => s.name).join(', ') || '';
 
   return `
 Analyze this resume against Vysus Group's power systems engineer role requirements. Use the Assessment Guide provided in the system message for scoring criteria and competency definitions.
@@ -194,6 +198,18 @@ ${leadSkills}
 
 PRINCIPAL ENGINEER (8 additional skills beyond Lead):
 ${principalSkills}
+
+INDUSTRY-GENERAL REQUIREMENTS (not Vysus-specific — broader power systems engineering):
+These are supplementary skills. Score them separately in the "industryMatches" section.
+
+SENIOR — Industry General (${industryRequirements?.senior?.skills?.length || 4} skills):
+${indSenior}
+
+LEAD — Industry General (${industryRequirements?.lead?.skills?.length || 3} skills):
+${indLead}
+
+PRINCIPAL — Industry General (${industryRequirements?.principal?.skills?.length || 3} skills):
+${indPrincipal}
 
 KEY TECHNICAL KEYWORDS TO LOOK FOR:
 - Software: PSCAD, PSS/E, PSSE, DIgSILENT, PowerFactory, ETAP, Python, MATLAB
@@ -222,6 +238,17 @@ Return a JSON object with this exact structure:
     "principal": {
       "score": <number 0-100>,
       "skills": ["strong"|"partial"|"none", ...] // exactly 8 values, one per Principal skill in order
+    }
+  },
+  "industryMatches": {
+    "senior": {
+      "skills": ["strong"|"partial"|"none", ...] // one per industry Senior skill in order
+    },
+    "lead": {
+      "skills": ["strong"|"partial"|"none", ...] // one per industry Lead skill in order
+    },
+    "principal": {
+      "skills": ["strong"|"partial"|"none", ...] // one per industry Principal skill in order
     }
   },
   "recommendation": "<one line hiring recommendation>",
