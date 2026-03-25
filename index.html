@@ -2466,14 +2466,34 @@
             try {
                 const text = await readResumeText(file);
                 debugLog('text_extracted', { length: text.length, preview: text.substring(0, 100) });
-                const emailMatch = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
-                if (emailMatch) document.getElementById('resumeCandidateEmail').value = emailMatch[0];
 
-                const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-                if (lines.length > 0) {
-                    let nameLine = lines[0].replace(/^(mr|mrs|ms|dr|prof)\.?\s*/i, '').replace(/\s+/g, ' ').trim();
-                    if (nameLine.split(' ').length <= 4 && /^[a-zA-Z\s\-']+$/.test(nameLine)) {
-                        document.getElementById('resumeCandidateName').value = nameLine;
+                // Find candidate's email — skip corporate/internal emails
+                const skipDomains = ['vysusgroup.com', 'vysus.com', 'designandbuild.com.au'];
+                const allEmails = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g) || [];
+                const candidateEmail = allEmails.find(e => !skipDomains.some(d => e.toLowerCase().endsWith(d)));
+                if (candidateEmail) {
+                    document.getElementById('resumeCandidateEmail').value = candidateEmail;
+                    debugLog('email_extracted', { email: candidateEmail, skipped: allEmails.filter(e => e !== candidateEmail) });
+                }
+
+                // Try to extract name from filename first (more reliable than PDF text)
+                const fileNameClean = file.name.replace(/\.(pdf|docx?|txt)$/i, '')
+                    .replace(/[-_]/g, ' ')
+                    .replace(/(resume|cv|formatted|updated|final|v\d+)/gi, '')
+                    .replace(/\s+/g, ' ').trim();
+                const fileNameWords = fileNameClean.split(' ').filter(w => w.length > 1);
+                if (fileNameWords.length >= 2 && fileNameWords.length <= 4 && /^[a-zA-Z\s\-']+$/.test(fileNameClean)) {
+                    document.getElementById('resumeCandidateName').value = fileNameClean;
+                    debugLog('name_from_filename', { name: fileNameClean });
+                } else {
+                    // Fallback: first line of text
+                    const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+                    if (lines.length > 0) {
+                        let nameLine = lines[0].replace(/^(mr|mrs|ms|dr|prof)\.?\s*/i, '').replace(/\s+/g, ' ').trim();
+                        if (nameLine.split(' ').length <= 4 && /^[a-zA-Z\s\-']+$/.test(nameLine)) {
+                            document.getElementById('resumeCandidateName').value = nameLine;
+                            debugLog('name_from_text', { name: nameLine });
+                        }
                     }
                 }
             } catch (err) {
