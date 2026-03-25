@@ -183,7 +183,7 @@ function buildAnalysisPrompt(resumeText, candidateName, targetPosition, roleRequ
 Analyze this resume against Vysus Group's power systems engineer role requirements. Use the Assessment Guide provided in the system message for scoring criteria and competency definitions.
 
 CANDIDATE: ${candidateName || 'Unknown'}
-TARGET POSITION: ${targetPosition} Engineer
+ASSESSMENT MODE: ${targetPosition === 'All Levels' ? 'Assess across ALL levels (Senior, Lead, Principal) and recommend the best fit based on evidence.' : 'Target position: ' + targetPosition + ' Engineer'}
 
 RESUME CONTENT:
 ${resumeText.substring(0, 8000)}
