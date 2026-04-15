@@ -397,11 +397,16 @@
                 return;
             }
 
-            // Check if already logged in
+            // Check if already logged in (validate with server, not just localStorage)
             const { session } = await getSession();
             if (session) {
-                window.location.href = '/index.html';
-                return;
+                const { user } = await getUser();
+                if (user) {
+                    window.location.href = '/index.html';
+                    return;
+                }
+                // Session was stale — clear it without redirect
+                await sb.auth.signOut();
             }
 
             // Check for auth callback (access token in URL)
