@@ -8,7 +8,7 @@
   node_bundler = "esbuild"
 
 # Environment variables for functions (set in Netlify dashboard)
-# GROQ_API_KEY - Required for resume analysis
+# DEEPSEEK_API_KEY - Required for resume analysis
 
 # Headers for security
 [[headers]]

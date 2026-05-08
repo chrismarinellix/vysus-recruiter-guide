@@ -1,6 +1,6 @@
-// Netlify Function for Resume Analysis using Groq API
+// Netlify Function for Resume Analysis using DeepSeek API
 
-const GROQ_API_KEY = process.env.GROQ_API_KEY;
+const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
 
 // Assessment guide embedded for LLM context (source: assessment-guide.md)
 const ASSESSMENT_GUIDE = `
@@ -75,11 +75,11 @@ exports.handler = async (event, context) => {
     };
   }
 
-  if (!GROQ_API_KEY) {
+  if (!DEEPSEEK_API_KEY) {
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ error: 'GROQ_API_KEY not configured' })
+      body: JSON.stringify({ error: 'DEEPSEEK_API_KEY not configured' })
     };
   }
 
@@ -94,58 +94,52 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Prepare the prompt for Groq
     const prompt = buildAnalysisPrompt(resumeText, candidateName, targetPosition, roleRequirements, industryRequirements);
 
-    // Call Groq API
-    const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    const dsResponse = await fetch('https://api.deepseek.com/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${GROQ_API_KEY}`,
+        'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
+        model: 'deepseek-reasoner',
         messages: [
           {
             role: 'system',
-            content: `You are an expert technical recruiter specializing in power systems engineering for the renewable energy sector at Vysus Group. You analyze resumes against specific role requirements and provide detailed, consistent skill matching analysis. You must strictly follow the assessment guide provided and never infer skills not explicitly stated in the resume. Always respond with valid JSON.\n\nASSESSMENT GUIDE:\n${ASSESSMENT_GUIDE}`
+            content: `You are an expert technical recruiter specializing in power systems engineering for the renewable energy sector at Vysus Group. You analyze resumes against specific role requirements and provide detailed, consistent skill matching analysis. You must strictly follow the assessment guide provided and never infer skills not explicitly stated in the resume. Always respond with a single valid JSON object and nothing else — no prose, no markdown fences.\n\nASSESSMENT GUIDE:\n${ASSESSMENT_GUIDE}`
           },
           {
             role: 'user',
             content: prompt
           }
         ],
-        temperature: 0.3,
-        max_tokens: 2000,
-        response_format: { type: 'json_object' }
+        max_tokens: 4000
       })
     });
 
-    if (!groqResponse.ok) {
-      const errorText = await groqResponse.text();
-      console.error('Groq API error:', errorText);
+    if (!dsResponse.ok) {
+      const errorText = await dsResponse.text();
+      console.error('DeepSeek API error:', errorText);
       return {
         statusCode: 502,
         headers,
-        body: JSON.stringify({ error: `Groq API error: ${groqResponse.status}`, details: errorText })
+        body: JSON.stringify({ error: `DeepSeek API error: ${dsResponse.status}`, details: errorText })
       };
     }
 
-    const groqData = await groqResponse.json();
-    const analysisText = groqData.choices[0]?.message?.content;
+    const dsData = await dsResponse.json();
+    const analysisText = dsData.choices[0]?.message?.content;
 
     if (!analysisText) {
-      throw new Error('No analysis returned from Groq');
+      throw new Error('No analysis returned from DeepSeek');
     }
 
-    // Parse the JSON response
     let analysis;
     try {
-      analysis = JSON.parse(analysisText);
+      analysis = JSON.parse(extractJson(analysisText));
     } catch (parseError) {
-      console.error('Failed to parse Groq response:', analysisText);
-      // Fallback to basic analysis
+      console.error('Failed to parse DeepSeek response:', analysisText);
       analysis = generateFallbackAnalysis(resumeText, targetPosition, roleRequirements);
     }
 
@@ -266,6 +260,15 @@ CRITICAL RULES:
 - International experience is valid but note if Australian NEM knowledge may need development.
 - Software tools must be explicitly named — do not assume from general descriptions.
 `;
+}
+
+function extractJson(text) {
+  const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+  if (fenced) return fenced[1].trim();
+  const first = text.indexOf('{');
+  const last = text.lastIndexOf('}');
+  if (first !== -1 && last > first) return text.slice(first, last + 1);
+  return text;
 }
 
 function generateFallbackAnalysis(resumeText, targetPosition, roleRequirements) {
