@@ -103,7 +103,7 @@ exports.handler = async (event, context) => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'deepseek-reasoner',
+        model: 'deepseek-chat',
         messages: [
           {
             role: 'system',
@@ -114,7 +114,9 @@ exports.handler = async (event, context) => {
             content: prompt
           }
         ],
-        max_tokens: 4000
+        temperature: 0.3,
+        max_tokens: 2000,
+        response_format: { type: 'json_object' }
       })
     });
 
