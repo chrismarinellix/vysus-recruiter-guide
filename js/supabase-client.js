@@ -319,6 +319,29 @@ async function isAdmin() {
   return data?.role === 'admin';
 }
 
+// Access level: 'admin' | 'standard' | 'limited'
+// Default to 'standard' on any DB error so a missing profile row doesn't lock users out.
+async function getUserAccessLevel() {
+  try {
+    const { user } = await getUser();
+    if (!user) return 'limited';
+    if (user.email === 'chris.marinelli@vysusgroup.com') return 'admin';
+    const { data } = await getProfile(user.id);
+    if (data?.role === 'admin') return 'admin';
+    if (data?.role === 'limited') return 'limited';
+    return 'standard';
+  } catch (e) {
+    return 'standard';
+  }
+}
+
+// WebAuthn passkey support detection
+function passkeySupported() {
+  return typeof window !== 'undefined'
+    && 'PublicKeyCredential' in window
+    && typeof window.PublicKeyCredential === 'function';
+}
+
 async function getAllUsers() {
   const { data, error } = await sb
     .from('recruiter_profiles')
@@ -350,6 +373,8 @@ if (typeof window !== 'undefined') {
   window.uploadResume = uploadResume;
   window.getResumeUrl = getResumeUrl;
   window.isAdmin = isAdmin;
+  window.getUserAccessLevel = getUserAccessLevel;
+  window.passkeySupported = passkeySupported;
   window.getAllUsers = getAllUsers;
   window.saveScreeningResult = saveScreeningResult;
   window.checkInterviewedCandidate = checkInterviewedCandidate;
